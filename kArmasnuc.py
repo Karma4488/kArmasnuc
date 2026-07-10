@@ -421,7 +421,7 @@ TEMPLATES = [
         "info": {"name": "Jenkins panel detected", "severity": "medium", "tags": "panel,admin,jenkins"},
         "http": [{
             "method": "GET",
-            "path": ["/jenkins/", "/jenkins/login", "/login?from=%2F"],
+            "path": ["/jenkins/", "/jenkins/login"],
             "matchers-condition": "and",
             "matchers": [
                 {"type": "status", "status": [200]},
@@ -449,7 +449,7 @@ TEMPLATES = [
         "info": {"name": "Elasticsearch open instance detected", "severity": "high", "tags": "exposure,elasticsearch,panel"},
         "http": [{
             "method": "GET",
-            "path": ["/", "/_cluster/health"],
+            "path": ["/_cluster/health"],
             "matchers-condition": "and",
             "matchers": [
                 {"type": "status", "status": [200]},
@@ -507,8 +507,7 @@ TEMPLATES = [
         "info": {"name": "Exposed SSH key or shell history file", "severity": "critical", "tags": "exposure,ssh,secrets"},
         "http": [{
             "method": "GET",
-            "path": ["/id_rsa", "/id_rsa.pub", "/.ssh/id_rsa", "/.ssh/id_rsa.pub", "/.ssh/config",
-                     "/.bash_history"],
+            "path": ["/.ssh/id_rsa", "/.ssh/id_rsa.pub", "/.ssh/config", "/.bash_history"],
             "matchers-condition": "and",
             "matchers": [
                 {"type": "status", "status": [200]},

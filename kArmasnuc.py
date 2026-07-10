@@ -272,6 +272,51 @@ TEMPLATES = [
             ],
         }],
     },
+    {
+        "id": "cookies-missing-secure",
+        "info": {"name": "Auth/session cookie without Secure flag", "severity": "medium", "tags": "misconfig,cookies,tls"},
+        "http": [{
+            "method": "GET",
+            "path": ["/"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "cookie_flag_missing", "flag": "Secure"},
+            ],
+            "extractors": [
+                {"cookie_flag_missing": ["Secure"]},
+            ],
+        }],
+    },
+    {
+        "id": "cookies-missing-httponly",
+        "info": {"name": "Auth/session cookie without HttpOnly flag", "severity": "medium", "tags": "misconfig,cookies"},
+        "http": [{
+            "method": "GET",
+            "path": ["/"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "cookie_flag_missing", "flag": "HttpOnly"},
+            ],
+            "extractors": [
+                {"cookie_flag_missing": ["HttpOnly"]},
+            ],
+        }],
+    },
+    {
+        "id": "cookies-missing-samesite",
+        "info": {"name": "Auth/session cookie without SameSite attribute", "severity": "medium", "tags": "misconfig,cookies,csrf"},
+        "http": [{
+            "method": "GET",
+            "path": ["/"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "cookie_flag_missing", "flag": "SameSite"},
+            ],
+            "extractors": [
+                {"cookie_flag_missing": ["SameSite"]},
+            ],
+        }],
+    },
 ]
 
 
@@ -292,6 +337,63 @@ def filter_templates(templates, severities=None, tags=None):
 # ------------------------------------------------------------------ #
 # Matcher / extractor engine
 # ------------------------------------------------------------------ #
+def is_auth_cookie_name(name):
+    lname = (name or "").strip().lower()
+    if not lname:
+        return False
+
+    ignore_exact = {
+        "_ga", "_gid", "_gat", "_fbp", "_gcl_au", "consent", "optanonconsent",
+        "__cf_bm", "_hjsession", "_hjsessionuser", "_uetsid", "_uetvid", "_clck", "_clsk",
+    }
+    if lname in ignore_exact:
+        return False
+
+    auth_keywords = [
+        "session", "sess", "sid", "token", "auth", "jwt", "remember", "csrf",
+    ]
+
+    if lname.startswith("__host-") or lname.startswith("__secure-"):
+        return True
+
+    return any(k in lname for k in auth_keywords)
+
+
+def parse_set_cookie_headers(resp):
+    raw_headers = []
+
+    try:
+        raw_headers = resp.raw.headers.getlist("Set-Cookie")
+    except Exception:
+        raw_headers = []
+
+    if not raw_headers:
+        try:
+            for k, v in resp.headers.items():
+                if k.lower() == "set-cookie":
+                    raw_headers.append(v)
+        except Exception:
+            pass
+
+    parsed = []
+    for line in raw_headers:
+        if not line:
+            continue
+        parts = [p.strip() for p in line.split(";") if p.strip()]
+        if not parts or "=" not in parts[0]:
+            continue
+        name = parts[0].split("=", 1)[0].strip()
+        attrs = set(p.split("=", 1)[0].strip().lower() for p in parts[1:])
+        parsed.append({
+            "name": name,
+            "raw": line,
+            "attrs": attrs,
+            "is_auth": is_auth_cookie_name(name),
+        })
+
+    return parsed
+
+
 def eval_matcher(m, resp, body_text):
     mtype = m.get("type")
     part = m.get("part", "body")
@@ -318,16 +420,33 @@ def eval_matcher(m, resp, body_text):
         result = all(hits) if cond == "and" else any(hits)
     elif mtype == "header_absent":
         result = m.get("header", "").lower() not in [h.lower() for h in resp.headers.keys()]
+    elif mtype == "cookie_flag_missing":
+        flag = (m.get("flag") or "").strip().lower()
+        if flag:
+            cookies = parse_set_cookie_headers(resp)
+            auth_cookies = [c for c in cookies if c.get("is_auth")]
+            result = any(flag not in c.get("attrs", set()) for c in auth_cookies)
 
     return (not result) if negative else result
 
 
-def run_extractors(extractors, body_text):
+def run_extractors(extractors, body_text, resp=None):
     found = []
     for ex in extractors or []:
         for p in ex.get("regex", []):
             matches = re.findall(p, body_text)
             found.extend(matches if isinstance(matches, list) else [matches])
+
+        if resp is not None:
+            for flag in ex.get("cookie_flag_missing", []):
+                flag_l = (flag or "").strip().lower()
+                if not flag_l:
+                    continue
+                cookies = parse_set_cookie_headers(resp)
+                for c in cookies:
+                    if c.get("is_auth") and flag_l not in c.get("attrs", set()):
+                        found.append(f"{c.get('name')} missing {flag}")
+
     return found[:10]
 
 
@@ -379,7 +498,7 @@ def scan_target(target, templates, timeout=8):
 
                 matcher_results = [eval_matcher(m, resp, body_text) for m in block.get("matchers", [])]
                 if matches_condition(matcher_results, matchers_cond):
-                    extracted = run_extractors(block.get("extractors"), body_text)
+                    extracted = run_extractors(block.get("extractors"), body_text, resp)
                     findings.append({
                         "template": tpl.get("id"),
                         "name": info.get("name", tpl.get("id")),

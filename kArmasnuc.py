@@ -455,7 +455,7 @@ TEMPLATES = [
             "matchers": [
                 {"type": "status", "status": [200]},
                 {"type": "regex", "part": "body",
-                 "regex": [r"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----"]},
+                 "regex": [r"-----BEGIN (?:RSA |EC |OPENSSH |ENCRYPTED )?PRIVATE KEY-----"]},
             ],
         }],
     },
@@ -516,7 +516,7 @@ TEMPLATES = [
             "matchers": [
                 {"type": "status", "status": [200]},
                 {"type": "regex", "part": "body",
-                 "regex": [r"(?i)[a-zA-Z0-9_-]+:\$apr1\$", r"(?i)[a-zA-Z0-9_-]+:\{SHA\}"]},
+                 "regex": [r"(?i)[^:]+:\$apr1\$", r"(?i)[^:]+:\{SHA\}"]},
             ],
         }],
     },
@@ -1653,7 +1653,7 @@ TEMPLATES = [
             "matchers": [
                 {"type": "status", "status": [200]},
                 {"type": "regex", "part": "body",
-                 "regex": [r"[0-9a-f]{4}#\s*service=git-upload-pack", r"[0-9a-f]{40}\s+refs/"]},
+                 "regex": [r"[0-9a-f]{4}# service=git-upload-pack", r"[0-9a-f]{40}\s+refs/"]},
             ],
         }],
     },

@@ -742,7 +742,7 @@ TEMPLATES = [
             "matchers": [
                 {"type": "status", "status": [200]},
                 {"type": "regex", "part": "body", "condition": "or",
-                 "regex": [r"(?m)^# yarn lockfile", r'(?m)^\s*version\s+"[^"]+"']},
+                 "regex": [r"(?m)^# yarn lockfile", r'(?m)^"?[^"\n]+@[^:\n]+:\n\s+version\s+"[^"]+"']},
             ],
         }],
     },
@@ -756,7 +756,7 @@ TEMPLATES = [
             "matchers": [
                 {"type": "status", "status": [200]},
                 {"type": "regex", "part": "body", "condition": "or",
-                 "regex": [r"(?m)^lockfileVersion:\s*", r"(?m)^packages:\s*$"]},
+                 "regex": [r"(?m)^lockfileVersion:\s*", r"(?m)^packages:\s*"]},
             ],
         }],
     },
@@ -868,8 +868,7 @@ TEMPLATES = [
             "matchers": [
                 {"type": "status", "status": [200]},
                 {"type": "regex", "part": "body", "condition": "or",
-                 "regex": [r"(?m)^[a-zA-Z0-9_.-]+==\d[\w.:-]*", r"(?m)^#.*requirements",
-                           r"(?m)^[a-zA-Z0-9_.-]+>=\d[\w.:-]*"]},
+                 "regex": [r"(?m)^[a-zA-Z0-9_.-]+==\d[\w.:-]*", r"(?m)^[a-zA-Z0-9_.-]+>=\d[\w.:-]*"]},
             ],
         }],
     },
@@ -897,7 +896,9 @@ TEMPLATES = [
             "matchers": [
                 {"type": "status", "status": [200]},
                 {"type": "regex", "part": "body", "condition": "or",
-                 "regex": [r"(?i)\"status\"\s*:\s*\"(ok|up|healthy|degraded)\"", r"(?i)uptime", r"(?i)version"]},
+                 "regex": [r'(?i)"status"\s*:\s*"(ok|up|healthy|degraded)"',
+                           r'(?i)"uptime"\s*:\s*[\d.]+',
+                           r'(?i)"version"\s*:\s*"[^"]+"']},
             ],
         }],
     },
@@ -911,7 +912,7 @@ TEMPLATES = [
             "matchers": [
                 {"type": "status", "status": [200]},
                 {"type": "regex", "part": "body", "condition": "or",
-                 "regex": [r"(?i)\b(healthy|ok|pass)\b", r"(?i)\"status\"\s*:", r"(?i)application"]},
+                 "regex": [r"(?i)\b(healthy|ok|pass)\b", r"(?i)\"status\"\s*:"]},
             ],
         }],
     },
@@ -953,10 +954,10 @@ TEMPLATES = [
             "matchers": [
                 {"type": "status", "status": [200]},
                 {"type": "regex", "part": "body", "condition": "or",
-                 "regex": [r"(?i)\bmailto:[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}\b"]},
+                 "regex": [r"(?i)mailto:[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}\b"]},
             ],
             "extractors": [
-                {"regex": [r"(?i)\b[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}\b"]},
+                {"regex": [r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b"]},
             ],
         }],
     },

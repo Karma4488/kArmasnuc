@@ -327,7 +327,7 @@ TEMPLATES = [
             "matchers": [
                 {"type": "status", "status": [200]},
                 {"type": "regex", "part": "body", "condition": "or",
-                 "regex": [r"(?m)^dir\s*$", r"(?m)^\d+\s*$", r"(?i)svn"]},
+                 "regex": [r"(?m)^dir\s*$", r"(?m)^\d+\s*$", r"(?m)^svn:.*$"]},
             ],
         }],
     },
@@ -350,12 +350,12 @@ TEMPLATES = [
         "info": {"name": "Exposed config.json with potential secrets", "severity": "high", "tags": "exposure,config,secrets"},
         "http": [{
             "method": "GET",
-            "path": ["/app/config.json", "/config/config.json"],
+            "path": ["/app/config.json", "/config/config.json", "/assets/config.json", "/static/config.json"],
             "matchers-condition": "and",
             "matchers": [
                 {"type": "status", "status": [200]},
                 {"type": "regex", "part": "body", "condition": "or",
-                 "regex": [r'(?i)"(api[_-]?key|client[_-]?secret|jwt[_-]?secret|db[_-]?password|access[_-]?key[_-]?id)"\s*:\s*"[^"]{8,}"']},
+                 "regex": [r"""(?i)['"]?(api[_-]?key|client[_-]?secret|jwt[_-]?secret|db[_-]?password|access[_-]?key[_-]?id)['"]?\s*:\s*['"][^'"]{4,}['"]"""]},
             ],
         }],
     },
@@ -407,7 +407,7 @@ TEMPLATES = [
         "http": [{
             "method": "GET",
             "path": ["/phpmyadmin/", "/phpMyAdmin/", "/pma/", "/adminer.php", "/adminer/",
-                     "/pgadmin/", "/pgadmin4/", "/pgadmin/login"],
+                     "/pgadmin/", "/pgadmin4/"],
             "matchers-condition": "and",
             "matchers": [
                 {"type": "status", "status": [200]},
@@ -478,7 +478,7 @@ TEMPLATES = [
         "info": {"name": "GraphQL endpoint detected", "severity": "medium", "tags": "api,graphql,debug"},
         "http": [{
             "method": "GET",
-            "path": ["/graphql", "/api/graphql"],
+            "path": ["/graphql", "/graphql/", "/api/graphql", "/api/v1/graphql", "/query"],
             "matchers-condition": "and",
             "matchers": [
                 {"type": "status", "status": [200, 400]},
@@ -514,8 +514,7 @@ TEMPLATES = [
                 {"type": "regex", "part": "body", "condition": "or",
                  "regex": [r"-----BEGIN (OPENSSH|RSA|DSA|EC) PRIVATE KEY-----",
                            r"(?m)^ssh-(rsa|ed25519|ecdsa)\s+[A-Za-z0-9+/=]+",
-                           r"(?m)^\s*Host\s+\S+", r"(?m)^\s*IdentityFile\s+\S+",
-                           r"(?m)^\s*(User|Port)\s+\S+"]},
+                           r"(?sm)^\s*Host\s+\S+.*^\s*(IdentityFile|User|Port|StrictHostKeyChecking|ProxyCommand)\s+\S+"]},
             ],
         }],
     },

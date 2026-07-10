@@ -531,6 +531,435 @@ TEMPLATES = [
         }],
     },
     {
+        "id": "robots-txt-discovery",
+        "info": {"name": "robots.txt discovered", "severity": "info", "tags": "osint,recon,robots,discovery"},
+        "http": [{
+            "method": "GET",
+            "path": ["/robots.txt"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?im)^(User-agent|Disallow|Allow|Sitemap)\s*:"]},
+            ],
+        }],
+    },
+    {
+        "id": "sitemap-xml-discovery",
+        "info": {"name": "Sitemap XML discovered", "severity": "info", "tags": "osint,recon,sitemap,discovery"},
+        "http": [{
+            "method": "GET",
+            "path": ["/sitemap.xml", "/sitemap_index.xml"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?i)<urlset\b", r"(?i)<sitemapindex\b", r"(?i)<loc>https?://"]},
+            ],
+        }],
+    },
+    {
+        "id": "humans-txt-discovery",
+        "info": {"name": "humans.txt discovered", "severity": "info", "tags": "osint,recon,humans,metadata"},
+        "http": [{
+            "method": "GET",
+            "path": ["/humans.txt"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?i)TEAM", r"(?i)THANKS", r"(?i)HUMANS\.TXT"]},
+            ],
+        }],
+    },
+    {
+        "id": "security-txt-discovery",
+        "info": {"name": "security.txt discovered", "severity": "low", "tags": "osint,recon,securitytxt,contact"},
+        "http": [{
+            "method": "GET",
+            "path": ["/.well-known/security.txt", "/security.txt"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?im)^(Contact|Expires|Encryption|Policy|Acknowledgments)\s*:"]},
+            ],
+            "extractors": [
+                {"regex": [r"(?im)^Contact:\s*(.+)$"]},
+            ],
+        }],
+    },
+    {
+        "id": "ads-txt-discovery",
+        "info": {"name": "ads.txt discovered", "severity": "info", "tags": "osint,recon,ads,metadata"},
+        "http": [{
+            "method": "GET",
+            "path": ["/ads.txt"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?im)^[\w.-]+\s*,\s*\d+\s*,\s*(DIRECT|RESELLER)"]},
+            ],
+        }],
+    },
+    {
+        "id": "assetlinks-json-discovery",
+        "info": {"name": "Android assetlinks discovered", "severity": "info", "tags": "osint,recon,mobile,android,well-known"},
+        "http": [{
+            "method": "GET",
+            "path": ["/.well-known/assetlinks.json"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r'"relation"\s*:', r'"target"\s*:', r'"android_app"']},
+            ],
+        }],
+    },
+    {
+        "id": "apple-app-site-association-discovery",
+        "info": {"name": "Apple app site association discovered", "severity": "info",
+                  "tags": "osint,recon,mobile,ios,well-known"},
+        "http": [{
+            "method": "GET",
+            "path": ["/.well-known/apple-app-site-association", "/apple-app-site-association"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r'"applinks"\s*:', r'"webcredentials"\s*:', r'"appID"\s*:']},
+            ],
+        }],
+    },
+    {
+        "id": "openid-configuration-discovery",
+        "info": {"name": "OpenID configuration metadata discovered", "severity": "low",
+                  "tags": "osint,recon,openid,oauth,api,well-known"},
+        "http": [{
+            "method": "GET",
+            "path": ["/.well-known/openid-configuration"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r'"issuer"\s*:', r'"authorization_endpoint"\s*:', r'"token_endpoint"\s*:']},
+            ],
+        }],
+    },
+    {
+        "id": "oauth-authorization-server-discovery",
+        "info": {"name": "OAuth authorization server metadata discovered", "severity": "low",
+                  "tags": "osint,recon,oauth,api,well-known"},
+        "http": [{
+            "method": "GET",
+            "path": ["/.well-known/oauth-authorization-server"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r'"issuer"\s*:', r'"authorization_endpoint"\s*:', r'"jwks_uri"\s*:']},
+            ],
+        }],
+    },
+    {
+        "id": "jwks-json-discovery",
+        "info": {"name": "JWKS endpoint discovered", "severity": "low", "tags": "osint,recon,jwks,oauth,api"},
+        "http": [{
+            "method": "GET",
+            "path": ["/.well-known/jwks.json", "/jwks.json"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r'"keys"\s*:\s*\[', r'"kty"\s*:', r'"kid"\s*:']},
+            ],
+        }],
+    },
+    {
+        "id": "web-manifest-discovery",
+        "info": {"name": "Web app manifest discovered", "severity": "info", "tags": "osint,recon,manifest,pwa,metadata"},
+        "http": [{
+            "method": "GET",
+            "path": ["/manifest.json", "/site.webmanifest"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r'"name"\s*:', r'"short_name"\s*:', r'"start_url"\s*:']},
+            ],
+        }],
+    },
+    {
+        "id": "browserconfig-xml-discovery",
+        "info": {"name": "browserconfig.xml discovered", "severity": "info", "tags": "osint,recon,metadata,windows"},
+        "http": [{
+            "method": "GET",
+            "path": ["/browserconfig.xml"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?i)<browserconfig\b", r"(?i)<msapplication\b", r"(?i)<tile"]},
+            ],
+        }],
+    },
+    {
+        "id": "package-json-exposure",
+        "info": {"name": "Public package.json metadata", "severity": "info", "tags": "osint,recon,metadata,nodejs"},
+        "http": [{
+            "method": "GET",
+            "path": ["/package.json"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r'"name"\s*:', r'"version"\s*:', r'"dependencies"\s*:']},
+            ],
+        }],
+    },
+    {
+        "id": "package-lock-exposure",
+        "info": {"name": "Public package-lock metadata", "severity": "info", "tags": "osint,recon,metadata,nodejs"},
+        "http": [{
+            "method": "GET",
+            "path": ["/package-lock.json"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r'"lockfileVersion"\s*:', r'"packages"\s*:', r'"dependencies"\s*:']},
+            ],
+        }],
+    },
+    {
+        "id": "yarn-lock-exposure",
+        "info": {"name": "Public yarn.lock metadata", "severity": "info", "tags": "osint,recon,metadata,nodejs"},
+        "http": [{
+            "method": "GET",
+            "path": ["/yarn.lock"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?m)^# yarn lockfile", r"(?m)^[^ \n][^:\n]*:\n\s+version\s+\""]},
+            ],
+        }],
+    },
+    {
+        "id": "pnpm-lock-exposure",
+        "info": {"name": "Public pnpm lock metadata", "severity": "info", "tags": "osint,recon,metadata,nodejs"},
+        "http": [{
+            "method": "GET",
+            "path": ["/pnpm-lock.yaml"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?m)^lockfileVersion:\s*", r"(?m)^packages:\s*$"]},
+            ],
+        }],
+    },
+    {
+        "id": "readme-public-discovery",
+        "info": {"name": "Public README discovered", "severity": "info", "tags": "osint,recon,docs,metadata"},
+        "http": [{
+            "method": "GET",
+            "path": ["/README.md", "/readme.md", "/README.txt"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?im)^#\s+\w+", r"(?im)^##\s+\w+", r"(?i)(installation|usage|license)"]},
+            ],
+        }],
+    },
+    {
+        "id": "changelog-public-discovery",
+        "info": {"name": "Public changelog discovered", "severity": "info", "tags": "osint,recon,docs,changelog,versioning"},
+        "http": [{
+            "method": "GET",
+            "path": ["/CHANGELOG.md", "/changelog.md", "/CHANGES.md"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?i)changelog", r"(?im)^##\s*\[?\d+\.\d+", r"(?i)(added|fixed|changed)"]},
+            ],
+        }],
+    },
+    {
+        "id": "license-public-discovery",
+        "info": {"name": "Public license file discovered", "severity": "info", "tags": "osint,recon,docs,license"},
+        "http": [{
+            "method": "GET",
+            "path": ["/LICENSE", "/LICENSE.txt", "/LICENSE.md"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?i)MIT License", r"(?i)Apache License", r"(?i)GNU GENERAL PUBLIC LICENSE"]},
+            ],
+        }],
+    },
+    {
+        "id": "gitignore-public-discovery",
+        "info": {"name": "Public .gitignore discovered", "severity": "info", "tags": "osint,recon,dev,metadata"},
+        "http": [{
+            "method": "GET",
+            "path": ["/.gitignore"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?m)^node_modules/?$", r"(?m)^\.env$", r"(?m)^__pycache__/"]},
+            ],
+        }],
+    },
+    {
+        "id": "editorconfig-public-discovery",
+        "info": {"name": "Public .editorconfig discovered", "severity": "info", "tags": "osint,recon,dev,metadata"},
+        "http": [{
+            "method": "GET",
+            "path": ["/.editorconfig"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?m)^\[\*\]$", r"(?m)^indent_style\s*=", r"(?m)^end_of_line\s*="]},
+            ],
+        }],
+    },
+    {
+        "id": "env-example-public-discovery",
+        "info": {"name": "Public .env example file discovered", "severity": "low", "tags": "osint,recon,config,env,metadata"},
+        "http": [{
+            "method": "GET",
+            "path": ["/.env.example", "/.env.sample", "/.env.dist", "/example.env"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?im)^(APP_ENV|APP_NAME|DATABASE_URL|DB_HOST)\s*="]},
+            ],
+        }],
+    },
+    {
+        "id": "dockerignore-public-discovery",
+        "info": {"name": "Public .dockerignore discovered", "severity": "info", "tags": "osint,recon,docker,metadata"},
+        "http": [{
+            "method": "GET",
+            "path": ["/.dockerignore"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?m)^node_modules/?$", r"(?m)^\.git/?$", r"(?m)^Dockerfile$"]},
+            ],
+        }],
+    },
+    {
+        "id": "requirements-txt-discovery",
+        "info": {"name": "Public requirements.txt metadata", "severity": "info", "tags": "osint,recon,python,metadata"},
+        "http": [{
+            "method": "GET",
+            "path": ["/requirements.txt"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?m)^[a-zA-Z0-9_.-]+==[0-9]", r"(?m)^#.*requirements", r"(?m)^[a-zA-Z0-9_.-]+>="]},
+            ],
+        }],
+    },
+    {
+        "id": "pyproject-toml-discovery",
+        "info": {"name": "Public pyproject.toml metadata", "severity": "info", "tags": "osint,recon,python,metadata"},
+        "http": [{
+            "method": "GET",
+            "path": ["/pyproject.toml"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?m)^\[build-system\]", r"(?m)^\[project\]", r"(?m)^name\s*="]},
+            ],
+        }],
+    },
+    {
+        "id": "status-endpoint-metadata",
+        "info": {"name": "Status endpoint metadata discovered", "severity": "low", "tags": "osint,recon,status,monitoring"},
+        "http": [{
+            "method": "GET",
+            "path": ["/status", "/status.json", "/api/status"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?i)\"status\"\s*:\s*\"(ok|up|healthy|degraded)\"", r"(?i)uptime", r"(?i)version"]},
+            ],
+        }],
+    },
+    {
+        "id": "health-endpoint-metadata",
+        "info": {"name": "Health endpoint metadata discovered", "severity": "low", "tags": "osint,recon,health,monitoring"},
+        "http": [{
+            "method": "GET",
+            "path": ["/health", "/healthz", "/livez", "/readyz"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?i)\b(healthy|ok|pass)\b", r"(?i)\"status\"\s*:", r"(?i)application"]},
+            ],
+        }],
+    },
+    {
+        "id": "prometheus-metrics-banner",
+        "info": {"name": "Prometheus metrics endpoint discovered", "severity": "medium", "tags": "osint,recon,metrics,prometheus"},
+        "http": [{
+            "method": "GET",
+            "path": ["/metrics", "/actuator/prometheus"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?m)^#\s*HELP\s+\w+", r"(?m)^#\s*TYPE\s+\w+", r"(?m)^process_cpu_seconds_total"]},
+            ],
+        }],
+    },
+    {
+        "id": "javascript-sourcemap-exposure",
+        "info": {"name": "JavaScript source map exposure", "severity": "medium", "tags": "osint,recon,javascript,sourcemap"},
+        "http": [{
+            "method": "GET",
+            "path": ["/app.js.map", "/main.js.map", "/bundle.js.map", "/static/js/main.js.map"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r'"version"\s*:\s*3', r'"sources"\s*:\s*\[', r'"mappings"\s*:']},
+            ],
+        }],
+    },
+    {
+        "id": "public-email-disclosure",
+        "info": {"name": "Public contact email disclosure", "severity": "info", "tags": "osint,recon,contact,email"},
+        "http": [{
+            "method": "GET",
+            "path": ["/", "/contact", "/about", "/impressum"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body",
+                 "regex": [r"(?i)\bmailto:[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b"]},
+            ],
+            "extractors": [
+                {"regex": [r"(?i)\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b"]},
+            ],
+        }],
+    },
+    {
         "id": "missing-browser-hardening-headers",
         "info": {"name": "Missing browser hardening header", "severity": "low", "tags": "misconfig,headers"},
         "http": [{

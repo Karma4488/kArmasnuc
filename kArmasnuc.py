@@ -455,7 +455,7 @@ TEMPLATES = [
             "matchers": [
                 {"type": "status", "status": [200]},
                 {"type": "regex", "part": "body",
-                 "regex": [r"-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----"]},
+                 "regex": [r"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----"]},
             ],
         }],
     },
@@ -516,7 +516,7 @@ TEMPLATES = [
             "matchers": [
                 {"type": "status", "status": [200]},
                 {"type": "regex", "part": "body",
-                 "regex": [r"(?i)\w+:\$apr1\$", r"(?i)\w+:\{SHA\}"]},
+                 "regex": [r"(?i)[a-zA-Z0-9_-]+:\$apr1\$", r"(?i)[a-zA-Z0-9_-]+:\{SHA\}"]},
             ],
         }],
     },
@@ -839,7 +839,7 @@ TEMPLATES = [
             "matchers": [
                 {"type": "status", "status": [200]},
                 {"type": "regex", "part": "body",
-                 "regex": [r"(ref: refs/heads/\w+|[0-9a-f]{40})"]},
+                 "regex": [r"(?:ref: refs/heads/\w+|[0-9a-f]{40})"]},
             ],
             "extractors": [
                 {"regex": [r"ref: refs/heads/(\w+)"]},
@@ -1653,7 +1653,7 @@ TEMPLATES = [
             "matchers": [
                 {"type": "status", "status": [200]},
                 {"type": "regex", "part": "body",
-                 "regex": [r"#\s*service=git-upload-pack", r"[0-9a-f]{40}\s+refs/"]},
+                 "regex": [r"[0-9a-f]{4}#\s*service=git-upload-pack", r"[0-9a-f]{40}\s+refs/"]},
             ],
         }],
     },

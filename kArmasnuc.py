@@ -317,6 +317,233 @@ TEMPLATES = [
             ],
         }],
     },
+    {
+        "id": "svn-entries-exposure",
+        "info": {"name": "Exposed Subversion metadata", "severity": "high", "tags": "exposure,svn,config"},
+        "http": [{
+            "method": "GET",
+            "path": ["/.svn/entries"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?m)^dir\s*$", r"(?m)^\d+\s*$", r"(?i)svn"]},
+            ],
+        }],
+    },
+    {
+        "id": "mercurial-repo-exposure",
+        "info": {"name": "Exposed Mercurial repository metadata", "severity": "high", "tags": "exposure,hg,config"},
+        "http": [{
+            "method": "GET",
+            "path": ["/.hg/requires", "/.hg/hgrc"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "word", "part": "body", "condition": "or",
+                 "words": ["revlogv1", "store", "fncache", "[paths]"]},
+            ],
+        }],
+    },
+    {
+        "id": "config-json-exposure",
+        "info": {"name": "Exposed config.json with potential secrets", "severity": "high", "tags": "exposure,config,secrets"},
+        "http": [{
+            "method": "GET",
+            "path": ["/config.json", "/app/config.json", "/assets/config.json", "/static/config.json"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r'(?i)"(api[_-]?key|client[_-]?secret|jwt[_-]?secret|db[_-]?password|access[_-]?key[_-]?id)"\s*:']},
+            ],
+        }],
+    },
+    {
+        "id": "npmrc-exposure",
+        "info": {"name": "Exposed .npmrc file", "severity": "critical", "tags": "exposure,npm,secrets"},
+        "http": [{
+            "method": "GET",
+            "path": ["/.npmrc"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?i)_authToken\s*=", r"(?i)//registry\..*:_(auth|password)\s*="]},
+            ],
+        }],
+    },
+    {
+        "id": "composer-files-exposure",
+        "info": {"name": "Exposed Composer manifest / lock file", "severity": "medium", "tags": "exposure,php,composer"},
+        "http": [{
+            "method": "GET",
+            "path": ["/composer.json", "/composer.lock"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r'"require"\s*:', r'"packages"\s*:']},
+            ],
+        }],
+    },
+    {
+        "id": "docker-files-exposure",
+        "info": {"name": "Exposed Docker build / compose file", "severity": "medium", "tags": "exposure,docker,config"},
+        "http": [{
+            "method": "GET",
+            "path": ["/Dockerfile", "/docker-compose.yml", "/docker-compose.yaml"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?m)^FROM\s+\S+", r"(?m)^services:\s*$", r"(?m)^version:\s*[\"']?\d"]},
+            ],
+        }],
+    },
+    {
+        "id": "db-admin-panels-detect",
+        "info": {"name": "Database admin panel detected", "severity": "medium", "tags": "panel,admin,phpmyadmin,adminer,pgadmin"},
+        "http": [{
+            "method": "GET",
+            "path": ["/phpmyadmin/", "/phpMyAdmin/", "/pma/", "/adminer.php", "/adminer/",
+                     "/pgadmin/", "/pgadmin4/", "/pgadmin/login"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "word", "part": "body", "condition": "or",
+                 "words": ["phpMyAdmin", "Adminer", "pgAdmin 4", "pgAdmin"]},
+            ],
+        }],
+    },
+    {
+        "id": "jenkins-panel-detect",
+        "info": {"name": "Jenkins panel detected", "severity": "medium", "tags": "panel,admin,jenkins"},
+        "http": [{
+            "method": "GET",
+            "path": ["/jenkins/", "/jenkins/login", "/login?from=%2F"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "word", "part": "body", "condition": "or",
+                 "words": ["Jenkins", "Dashboard [Jenkins]", "Sign in [Jenkins]"]},
+            ],
+        }],
+    },
+    {
+        "id": "observability-panels-detect",
+        "info": {"name": "Grafana or Kibana panel detected", "severity": "medium", "tags": "panel,admin,grafana,kibana"},
+        "http": [{
+            "method": "GET",
+            "path": ["/grafana/login", "/login/grafana", "/app/kibana", "/kibana/"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "word", "part": "body", "condition": "or",
+                 "words": ["Grafana", "Welcome to Grafana", "kibanaWelcomeText", "Kibana"]},
+            ],
+        }],
+    },
+    {
+        "id": "elasticsearch-open-instance",
+        "info": {"name": "Elasticsearch open instance detected", "severity": "high", "tags": "exposure,elasticsearch,panel"},
+        "http": [{
+            "method": "GET",
+            "path": ["/", "/_cluster/health"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r'"cluster_name"\s*:', r'"tagline"\s*:\s*"You Know, for Search"',
+                           r'"status"\s*:\s*"(green|yellow|red)"']},
+            ],
+        }],
+    },
+    {
+        "id": "swagger-ui-detect",
+        "info": {"name": "Swagger UI / OpenAPI docs detected", "severity": "medium", "tags": "docs,api,swagger,openapi"},
+        "http": [{
+            "method": "GET",
+            "path": ["/swagger-ui.html", "/swagger/index.html", "/swagger.json", "/v2/api-docs", "/v3/api-docs"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "word", "part": "body", "condition": "or",
+                 "words": ["Swagger UI", "\"swagger\":", "\"openapi\":"]},
+            ],
+        }],
+    },
+    {
+        "id": "graphql-endpoint-detect",
+        "info": {"name": "GraphQL endpoint detected", "severity": "medium", "tags": "api,graphql,debug"},
+        "http": [{
+            "method": "GET",
+            "path": ["/graphql", "/api/graphql"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200, 400]},
+                {"type": "word", "part": "body", "condition": "or",
+                 "words": ["GraphQL", "graphiql", "Must provide query string", "IntrospectionQuery"]},
+            ],
+        }],
+    },
+    {
+        "id": "spring-actuator-exposure",
+        "info": {"name": "Spring Boot Actuator endpoint exposed", "severity": "medium", "tags": "debug,spring,actuator"},
+        "http": [{
+            "method": "GET",
+            "path": ["/actuator/health", "/actuator/env"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r'"status"\s*:\s*"(UP|DOWN|OUT_OF_SERVICE|UNKNOWN)"',
+                           r'"activeProfiles"\s*:', r'"propertySources"\s*:']},
+            ],
+        }],
+    },
+    {
+        "id": "sensitive-ssh-files-exposure",
+        "info": {"name": "Exposed SSH key or shell history file", "severity": "critical", "tags": "exposure,ssh,secrets"},
+        "http": [{
+            "method": "GET",
+            "path": ["/id_rsa", "/id_rsa.pub", "/.ssh/id_rsa", "/.ssh/id_rsa.pub", "/.ssh/config",
+                     "/.bash_history"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"-----BEGIN (OPENSSH|RSA|DSA|EC) PRIVATE KEY-----",
+                           r"(?m)^ssh-(rsa|ed25519|ecdsa)\s+[A-Za-z0-9+/=]+",
+                           r"(?m)^\s*Host\s+\S+", r"(?m)^\s*IdentityFile\s+\S+",
+                           r"(?m)^\s*(sudo|ssh|kubectl|docker|mysql|psql)\b"]},
+            ],
+        }],
+    },
+    {
+        "id": "missing-browser-hardening-headers",
+        "info": {"name": "Missing browser hardening header", "severity": "low", "tags": "misconfig,headers"},
+        "http": [
+            {
+                "method": "GET",
+                "path": ["/"],
+                "matchers-condition": "and",
+                "matchers": [
+                    {"type": "status", "status": [200]},
+                    {"type": "header_absent", "header": "Content-Security-Policy"},
+                ],
+            },
+            {
+                "method": "GET",
+                "path": ["/"],
+                "matchers-condition": "and",
+                "matchers": [
+                    {"type": "status", "status": [200]},
+                    {"type": "header_absent", "header": "X-Content-Type-Options"},
+                ],
+            },
+        ],
+    },
 ]
 
 

@@ -373,7 +373,8 @@ TEMPLATES = [
             "matchers": [
                 {"type": "status", "status": [200]},
                 {"type": "regex", "part": "body", "condition": "or",
-                 "regex": [r"(?m)^\s*[#*!]", r"(?m)^\s*\*\.\w+", r"(?m)^/?\w"]},
+                 "regex": [r"(?m)^\s*[#*!]", r"(?m)^\s*\*\.\w+",
+                            r"(?m)^/?[\w./-]+(\.[\w]+)?$"]},
             ],
         }],
     },
@@ -401,8 +402,11 @@ TEMPLATES = [
             "matchers-condition": "and",
             "matchers": [
                 {"type": "status", "status": [200]},
+                # .svn/entries starts with a plain integer version line ("10\n")
+                # followed by a blank line and then entry records; require both
+                # the version-line shape and at least one svn: field.
                 {"type": "regex", "part": "body", "condition": "or",
-                 "regex": [r"(?i)svn:", r"^\d+$"]},
+                 "regex": [r"(?i)svn:", r"(?ms)^\d+\n\n"]},
             ],
         }],
     },
@@ -525,7 +529,7 @@ TEMPLATES = [
             "matchers": [
                 {"type": "status", "status": [200]},
                 {"type": "regex", "part": "body",
-                 "regex": [r"(?m)^[\w\-]+[>=<!~\[]"]},
+                 "regex": [r"(?m)^[\w-]+[>=<!~\[\]]"]},
             ],
         }],
     },
@@ -776,6 +780,9 @@ TEMPLATES = [
                   "tags": "exposure,django,python,debug"},
         "http": [{
             "method": "GET",
+            # Requesting a guaranteed-nonexistent path triggers Django's debug
+            # 404 page (when DEBUG=True), which includes framework details.
+            # The /__debug__/ path is checked for the django-debug-toolbar.
             "path": ["/__debug__/", "/nonexistent-kArmasnuc-django-probe-xyz"],
             "matchers-condition": "or",
             "matchers": [
@@ -1468,18 +1475,19 @@ TEMPLATES = [
                      "/web.zip", "/public_html.zip", "/files.zip",
                      "/db.sql.gz", "/dump.sql.gz", "/config.bak",
                      "/config.old", "/config.orig"],
-            "matchers-condition": "and",
+            "matchers-condition": "or",
             "matchers": [
-                {"type": "status", "status": [200]},
-                {"type": "regex", "part": "body", "negative": True,
-                 "regex": [r"(?i)<title>\s*(404|not found|error)"]},
+                # Binary archives return octet-stream; SQL dumps are text/plain.
+                # Use content-type as a positive signal rather than a fragile
+                # negative HTML-title check.
+                {"type": "regex", "part": "header",
+                 "regex": [r"(?i)Content-Type:\s*(application/(octet-stream|zip|x-gzip|x-tar|gzip|sql)|text/plain)"]},
             ],
         }],
     },
 
     # ------------------------------------------------------------------ #
     # Framework / Next.js / Vite Build Artifact Exposure
-    # ------------------------------------------------------------------ #
     {
         "id": "nextjs-build-manifest-exposure",
         "info": {"name": "Exposed Next.js build-manifest.json", "severity": "low",
@@ -1580,8 +1588,11 @@ TEMPLATES = [
             "matchers": [
                 {"type": "status", "status": [200]},
                 {"type": "regex", "part": "body", "condition": "or",
-                 "regex": [r"(?i)Index of /.git", r"HEAD", r"config",
-                            r"COMMIT_EDITMSG"]},
+                 # Match actual directory listing entries for git repository files
+                 "regex": [r'(?i)Index of /.git',
+                            r'(?i)<a href="HEAD">',
+                            r'(?i)<a href="COMMIT_EDITMSG">',
+                            r'(?i)<a href="config">']},
             ],
         }],
     },

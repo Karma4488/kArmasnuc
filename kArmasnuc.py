@@ -350,7 +350,7 @@ TEMPLATES = [
         "info": {"name": "Exposed config.json with potential secrets", "severity": "high", "tags": "exposure,config,secrets"},
         "http": [{
             "method": "GET",
-            "path": ["/config.json", "/app/config.json", "/assets/config.json", "/static/config.json"],
+            "path": ["/config.json"],
             "matchers-condition": "and",
             "matchers": [
                 {"type": "status", "status": [200]},
@@ -504,10 +504,10 @@ TEMPLATES = [
     },
     {
         "id": "sensitive-ssh-files-exposure",
-        "info": {"name": "Exposed SSH key or shell history file", "severity": "critical", "tags": "exposure,ssh,secrets"},
+        "info": {"name": "Exposed SSH key or SSH config file", "severity": "critical", "tags": "exposure,ssh,secrets"},
         "http": [{
             "method": "GET",
-            "path": ["/.ssh/id_rsa", "/.ssh/id_rsa.pub", "/.ssh/config", "/.bash_history"],
+            "path": ["/.ssh/id_rsa", "/.ssh/id_rsa.pub", "/.ssh/config"],
             "matchers-condition": "and",
             "matchers": [
                 {"type": "status", "status": [200]},

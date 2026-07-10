@@ -954,10 +954,10 @@ TEMPLATES = [
             "matchers": [
                 {"type": "status", "status": [200]},
                 {"type": "regex", "part": "body", "condition": "or",
-                 "regex": [r"(?i)mailto:[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b"]},
+                 "regex": [r"(?i)(?:mailto:)?[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b"]},
             ],
             "extractors": [
-                {"regex": [r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b"]},
+                {"regex": [r"(?i)(?:mailto:)?[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b"]},
             ],
         }],
     },

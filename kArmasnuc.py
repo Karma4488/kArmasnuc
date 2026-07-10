@@ -742,7 +742,7 @@ TEMPLATES = [
             "matchers": [
                 {"type": "status", "status": [200]},
                 {"type": "regex", "part": "body", "condition": "or",
-                 "regex": [r"(?m)^# yarn lockfile", r"(?m)^[^ \n][^:\n]*:\n\s+version\s+\""]},
+                 "regex": [r"(?m)^# yarn lockfile", r'(?m)^\s*version\s+"[^"]+"']},
             ],
         }],
     },
@@ -868,7 +868,8 @@ TEMPLATES = [
             "matchers": [
                 {"type": "status", "status": [200]},
                 {"type": "regex", "part": "body", "condition": "or",
-                 "regex": [r"(?m)^[a-zA-Z0-9_.-]+==[0-9]", r"(?m)^#.*requirements", r"(?m)^[a-zA-Z0-9_.-]+>="]},
+                 "regex": [r"(?m)^[a-zA-Z0-9_.-]+==\d[\w.:-]*", r"(?m)^#.*requirements",
+                           r"(?m)^[a-zA-Z0-9_.-]+>=\d[\w.:-]*"]},
             ],
         }],
     },
@@ -916,7 +917,7 @@ TEMPLATES = [
     },
     {
         "id": "prometheus-metrics-discovery",
-        "info": {"name": "Prometheus metrics endpoint discovered", "severity": "medium", "tags": "osint,recon,metrics,prometheus"},
+        "info": {"name": "Prometheus metrics endpoint discovered", "severity": "low", "tags": "osint,recon,metrics,prometheus"},
         "http": [{
             "method": "GET",
             "path": ["/metrics", "/actuator/prometheus"],
@@ -930,7 +931,7 @@ TEMPLATES = [
     },
     {
         "id": "javascript-sourcemap-exposure",
-        "info": {"name": "JavaScript source map exposure", "severity": "medium", "tags": "osint,recon,javascript,sourcemap"},
+        "info": {"name": "JavaScript source map exposure", "severity": "low", "tags": "osint,recon,javascript,sourcemap"},
         "http": [{
             "method": "GET",
             "path": ["/app.js.map", "/main.js.map", "/bundle.js.map", "/static/js/main.js.map"],
@@ -952,10 +953,10 @@ TEMPLATES = [
             "matchers": [
                 {"type": "status", "status": [200]},
                 {"type": "regex", "part": "body", "condition": "or",
-                 "regex": [r"(?i)\bmailto:[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b"]},
+                 "regex": [r"(?i)\bmailto:[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}\b"]},
             ],
             "extractors": [
-                {"regex": [r"(?i)\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b"]},
+                {"regex": [r"(?i)\b[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}\b"]},
             ],
         }],
     },

@@ -574,7 +574,7 @@ TEMPLATES = [
     },
     {
         "id": "security-txt-discovery",
-        "info": {"name": "security.txt discovered", "severity": "low", "tags": "osint,recon,securitytxt,contact"},
+        "info": {"name": "security.txt discovered", "severity": "low", "tags": "osint,recon,security-txt,contact"},
         "http": [{
             "method": "GET",
             "path": ["/.well-known/security.txt", "/security.txt"],

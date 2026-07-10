@@ -350,12 +350,12 @@ TEMPLATES = [
         "info": {"name": "Exposed config.json with potential secrets", "severity": "high", "tags": "exposure,config,secrets"},
         "http": [{
             "method": "GET",
-            "path": ["/config.json"],
+            "path": ["/app/config.json", "/config/config.json"],
             "matchers-condition": "and",
             "matchers": [
                 {"type": "status", "status": [200]},
                 {"type": "regex", "part": "body", "condition": "or",
-                 "regex": [r'(?i)"(api[_-]?key|client[_-]?secret|jwt[_-]?secret|db[_-]?password|access[_-]?key[_-]?id)"\s*:']},
+                 "regex": [r'(?i)"(api[_-]?key|client[_-]?secret|jwt[_-]?secret|db[_-]?password|access[_-]?key[_-]?id)"\s*:\s*"[^"]{8,}"']},
             ],
         }],
     },
@@ -435,7 +435,7 @@ TEMPLATES = [
         "info": {"name": "Grafana or Kibana panel detected", "severity": "medium", "tags": "panel,admin,grafana,kibana"},
         "http": [{
             "method": "GET",
-            "path": ["/grafana/login", "/login/grafana", "/app/kibana", "/kibana/"],
+            "path": ["/grafana/login", "/kibana/"],
             "matchers-condition": "and",
             "matchers": [
                 {"type": "status", "status": [200]},
@@ -515,7 +515,7 @@ TEMPLATES = [
                  "regex": [r"-----BEGIN (OPENSSH|RSA|DSA|EC) PRIVATE KEY-----",
                            r"(?m)^ssh-(rsa|ed25519|ecdsa)\s+[A-Za-z0-9+/=]+",
                            r"(?m)^\s*Host\s+\S+", r"(?m)^\s*IdentityFile\s+\S+",
-                           r"(?m)^\s*(sudo|ssh|kubectl|docker|mysql|psql)\b"]},
+                           r"(?m)^\s*(User|Port)\s+\S+"]},
             ],
         }],
     },

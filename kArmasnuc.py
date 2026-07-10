@@ -742,7 +742,7 @@ TEMPLATES = [
             "matchers": [
                 {"type": "status", "status": [200]},
                 {"type": "regex", "part": "body", "condition": "or",
-                 "regex": [r"(?m)^# yarn lockfile", r'(?m)^"?[^"\n]+@[^:\n]+:\n\s+version\s+"[^"]+"']},
+                 "regex": [r"(?m)^# yarn lockfile", r'(?m)^"?[^"\n]+@[^:\n]+:\s*$']},
             ],
         }],
     },
@@ -868,7 +868,7 @@ TEMPLATES = [
             "matchers": [
                 {"type": "status", "status": [200]},
                 {"type": "regex", "part": "body", "condition": "or",
-                 "regex": [r"(?m)^[a-zA-Z0-9_.-]+==\d[\w.:-]*", r"(?m)^[a-zA-Z0-9_.-]+>=\d[\w.:-]*"]},
+                 "regex": [r"(?m)^[a-zA-Z0-9_.-]+(==|>=)\d[\w.:-]*"]},
             ],
         }],
     },
@@ -954,7 +954,7 @@ TEMPLATES = [
             "matchers": [
                 {"type": "status", "status": [200]},
                 {"type": "regex", "part": "body", "condition": "or",
-                 "regex": [r"(?i)mailto:[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}\b"]},
+                 "regex": [r"(?i)mailto:[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b"]},
             ],
             "extractors": [
                 {"regex": [r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b"]},

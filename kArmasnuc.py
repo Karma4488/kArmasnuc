@@ -455,7 +455,7 @@ TEMPLATES = [
             "matchers": [
                 {"type": "status", "status": [200]},
                 {"type": "regex", "part": "body",
-                 "regex": [r"-----BEGIN (RSA |EC |OPENSSH |)PRIVATE KEY-----"]},
+                 "regex": [r"-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----"]},
             ],
         }],
     },
@@ -516,7 +516,7 @@ TEMPLATES = [
             "matchers": [
                 {"type": "status", "status": [200]},
                 {"type": "regex", "part": "body",
-                 "regex": [r"(?i)\w+:\$apr1\$", r"(?i)\w+:\{SHA\}", r"(?i)\w+:[a-zA-Z0-9./]{13}"]},
+                 "regex": [r"(?i)\w+:\$apr1\$", r"(?i)\w+:\{SHA\}"]},
             ],
         }],
     },
@@ -613,7 +613,7 @@ TEMPLATES = [
             "path": ["/debug", "/_debug", "/debug/", "/console",
                      "/rails/info/properties", "/rails/info", "/_profiler",
                      "/app_dev.php", "/app_dev.php/_profiler"],
-            "matchers-condition": "or",
+            "matchers-condition": "and",
             "matchers": [
                 {"type": "status", "status": [200]},
                 {"type": "regex", "part": "body", "condition": "or",
@@ -839,7 +839,7 @@ TEMPLATES = [
             "matchers": [
                 {"type": "status", "status": [200]},
                 {"type": "regex", "part": "body",
-                 "regex": [r"ref: refs/heads/\w+|[0-9a-f]{40}"]},
+                 "regex": [r"(ref: refs/heads/\w+|[0-9a-f]{40})"]},
             ],
             "extractors": [
                 {"regex": [r"ref: refs/heads/(\w+)"]},
@@ -1076,7 +1076,7 @@ TEMPLATES = [
                   "tags": "exposure,panel,prometheus,monitoring"},
         "http": [{
             "method": "GET",
-            "path": ["/metrics", "/:metrics", "/prometheus/metrics"],
+            "path": ["/metrics", "/api/metrics", "/prometheus/metrics"],
             "matchers-condition": "and",
             "matchers": [
                 {"type": "status", "status": [200]},
@@ -1299,7 +1299,7 @@ TEMPLATES = [
             "matchers": [
                 {"type": "status", "status": [200]},
                 {"type": "regex", "part": "body", "condition": "or",
-                 "regex": [r"(?i)^services\s*:", r"(?i)image:\s*\w", r"(?i)container_name\s*:"]},
+                 "regex": [r"(?i)services\s*:", r"(?i)image:\s*\w", r"(?i)container_name\s*:"]},
             ],
         }],
     },
@@ -1314,7 +1314,7 @@ TEMPLATES = [
             "matchers": [
                 {"type": "status", "status": [200]},
                 {"type": "regex", "part": "body", "condition": "or",
-                 "regex": [r"(?i)^FROM\s+\w", r"(?i)^RUN\s+", r"(?i)^ENV\s+"]},
+                 "regex": [r"(?i)FROM\s+\w", r"(?i)RUN\s+", r"(?i)ENV\s+"]},
             ],
         }],
     },
@@ -1362,7 +1362,7 @@ TEMPLATES = [
             "matchers": [
                 {"type": "status", "status": [200]},
                 {"type": "regex", "part": "body", "condition": "or",
-                 "regex": [r"(?i)^service\s*:", r"(?i)provider\s*:\s*\n\s*name",
+                 "regex": [r"(?i)service\s*:", r"(?i)provider\s*:",
                            r"(?i)functions\s*:"]},
             ],
         }],
@@ -1396,7 +1396,7 @@ TEMPLATES = [
             "matchers": [
                 {"type": "status", "status": [200]},
                 {"type": "regex", "part": "body", "condition": "or",
-                 "regex": [r"(?i)^runtime\s*:", r"(?i)^service\s*:", r"(?i)env_variables\s*:"]},
+                 "regex": [r"(?i)runtime\s*:", r"(?i)service\s*:", r"(?i)env_variables\s*:"]},
             ],
         }],
     },
@@ -1653,7 +1653,7 @@ TEMPLATES = [
             "matchers": [
                 {"type": "status", "status": [200]},
                 {"type": "regex", "part": "body",
-                 "regex": [r"# service=git-upload-pack", r"[0-9a-f]{40}\s+refs/"]},
+                 "regex": [r"#\s*service=git-upload-pack", r"[0-9a-f]{40}\s+refs/"]},
             ],
         }],
     },

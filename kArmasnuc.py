@@ -1194,7 +1194,7 @@ TEMPLATES = [
                   "tags": "exposure,portainer,docker,panel"},
         "http": [{
             "method": "GET",
-            "path": ["/portainer/", "/#/init/admin", "/api/system/status"],
+            "path": ["/portainer/", "/api/system/status"],
             "matchers-condition": "and",
             "matchers": [
                 {"type": "status", "status": [200]},
@@ -1210,7 +1210,7 @@ TEMPLATES = [
                   "tags": "exposure,solr,database,panel"},
         "http": [{
             "method": "GET",
-            "path": ["/solr/", "/solr/#/", "/solr/admin/info/system?wt=json"],
+            "path": ["/solr/", "/solr/admin/info/system?wt=json"],
             "matchers-condition": "and",
             "matchers": [
                 {"type": "status", "status": [200]},
@@ -1226,7 +1226,7 @@ TEMPLATES = [
                   "tags": "exposure,rabbitmq,panel"},
         "http": [{
             "method": "GET",
-            "path": ["/rabbitmq/", "/#/"],
+            "path": ["/rabbitmq/", "/api/overview"],
             "matchers-condition": "and",
             "matchers": [
                 {"type": "status", "status": [200]},

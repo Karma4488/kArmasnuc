@@ -915,7 +915,7 @@ TEMPLATES = [
         }],
     },
     {
-        "id": "prometheus-metrics-banner",
+        "id": "prometheus-metrics-discovery",
         "info": {"name": "Prometheus metrics endpoint discovered", "severity": "medium", "tags": "osint,recon,metrics,prometheus"},
         "http": [{
             "method": "GET",
@@ -951,7 +951,7 @@ TEMPLATES = [
             "matchers-condition": "and",
             "matchers": [
                 {"type": "status", "status": [200]},
-                {"type": "regex", "part": "body",
+                {"type": "regex", "part": "body", "condition": "or",
                  "regex": [r"(?i)\bmailto:[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b"]},
             ],
             "extractors": [

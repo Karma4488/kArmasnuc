@@ -478,7 +478,7 @@ TEMPLATES = [
         "info": {"name": "GraphQL endpoint detected", "severity": "medium", "tags": "api,graphql,debug"},
         "http": [{
             "method": "GET",
-            "path": ["/graphql", "/graphql/", "/api/graphql", "/api/v1/graphql", "/query"],
+            "path": ["/graphql", "/graphql/", "/api/graphql", "/api/v1/graphql"],
             "matchers-condition": "and",
             "matchers": [
                 {"type": "status", "status": [200, 400]},
@@ -514,33 +514,24 @@ TEMPLATES = [
                 {"type": "regex", "part": "body", "condition": "or",
                  "regex": [r"-----BEGIN (OPENSSH|RSA|DSA|EC) PRIVATE KEY-----",
                            r"(?m)^ssh-(rsa|ed25519|ecdsa)\s+[A-Za-z0-9+/=]+",
-                           r"(?sm)^\s*Host\s+\S+.*^\s*(IdentityFile|User|Port|StrictHostKeyChecking|ProxyCommand)\s+\S+"]},
+                           r"(?sm)^\s*Host\s+\S+.*?^\s*(IdentityFile|User|Port|StrictHostKeyChecking|ProxyCommand)\s+\S+"]},
             ],
         }],
     },
     {
         "id": "missing-browser-hardening-headers",
         "info": {"name": "Missing browser hardening header", "severity": "low", "tags": "misconfig,headers"},
-        "http": [
-            {
-                "method": "GET",
-                "path": ["/"],
-                "matchers-condition": "and",
-                "matchers": [
-                    {"type": "status", "status": [200]},
-                    {"type": "header_absent", "header": "Content-Security-Policy"},
-                ],
-            },
-            {
-                "method": "GET",
-                "path": ["/"],
-                "matchers-condition": "and",
-                "matchers": [
-                    {"type": "status", "status": [200]},
-                    {"type": "header_absent", "header": "X-Content-Type-Options"},
-                ],
-            },
-        ],
+        "http": [{
+            "method": "GET",
+            "path": ["/"],
+            "matchers-condition": "or",
+            "matchers": [
+                {"type": "regex", "part": "header", "negative": True,
+                 "regex": [r"(?im)^Content-Security-Policy:"]},
+                {"type": "regex", "part": "header", "negative": True,
+                 "regex": [r"(?im)^X-Content-Type-Options:"]},
+            ],
+        }],
     },
 ]
 

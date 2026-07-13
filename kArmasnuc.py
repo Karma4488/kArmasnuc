@@ -255,7 +255,7 @@ TEMPLATES = [
             "matchers-condition": "or",
             "matchers": [
                 {"type": "word", "part": "body", "condition": "or",
-                 "words": ["wp-content", "wp-includes", "wp-login.php", "/wp-json/"]},
+                 "words": ["wp-content", "wp-includes", "wp-login.php", "wp-json"]},
                 {"type": "regex", "part": "header",
                  "regex": [r"(?im)^X-Pingback:\s*[^\r\n]*xmlrpc\.php", r"(?im)^Link:\s*<[^>]*wp-json[^>]*>"]},
             ],
@@ -440,7 +440,7 @@ TEMPLATES = [
             "matchers": [
                 {"type": "status", "status": [200, 401, 403]},
                 {"type": "word", "part": "body", "condition": "or",
-                 "words": ["Jenkins", "Dashboard [Jenkins]", "Sign in [Jenkins]", "jenkins"]},
+                 "words": ["Jenkins", "Dashboard [Jenkins]", "Sign in [Jenkins]"]},
             ],
         }],
     },

@@ -65,6 +65,26 @@ SEVERITY_COLOR = {
     "critical": BOLD + RED,
 }
 
+SOFT_404_BODY_PATTERNS = [
+    r"(?i)<title>\s*(404|not found|error|access denied|forbidden)",
+    r"(?i)\b(404|page not found|not found|access denied|forbidden)\b",
+    r"(?i)the requested url was not found",
+    r"(?i)cannot (get|post) /",
+]
+
+TEXT_LIKE_CONTENT_TYPES = (
+    "text/",
+    "application/json",
+    "application/javascript",
+    "application/x-javascript",
+    "application/xml",
+    "application/xhtml+xml",
+    "application/x-httpd-php",
+    "application/x-sh",
+    "application/x-yaml",
+    "application/yaml",
+)
+
 # ------------------------------------------------------------------ #
 # Embedded templates
 # ------------------------------------------------------------------ #
@@ -1069,6 +1089,141 @@ def parse_set_cookie_headers(resp):
     return parsed
 
 
+def flatten_extracted_items(items):
+    flattened = []
+    for item in items or []:
+        if isinstance(item, tuple):
+            flattened.append(" = ".join(str(part) for part in item if str(part).strip()))
+        else:
+            flattened.append(str(item))
+    return flattened
+
+
+def get_header_value(resp, header_name):
+    for key, value in resp.headers.items():
+        if key.lower() == header_name.lower():
+            return value
+    return ""
+
+
+def is_text_like_response(resp):
+    content_type = (get_header_value(resp, "Content-Type") or "").lower()
+    return any(token in content_type for token in TEXT_LIKE_CONTENT_TYPES)
+
+
+def looks_like_soft_404(resp, body_text):
+    if resp.status_code in {404, 410}:
+        return True
+
+    if resp.status_code in {401, 403}:
+        return True
+
+    snippet = (body_text or "")[:4000]
+    return any(re.search(pattern, snippet, re.IGNORECASE) for pattern in SOFT_404_BODY_PATTERNS)
+
+
+def should_skip_false_positive(template_id, resp, body_text):
+    text_like = is_text_like_response(resp)
+    soft_404 = looks_like_soft_404(resp, body_text)
+    body_lower = (body_text or "").lower()
+    content_type = (get_header_value(resp, "Content-Type") or "").lower()
+    content_length = get_header_value(resp, "Content-Length") or ""
+
+    if template_id in {
+        "git-config-exposure",
+        "git-head-exposure",
+        "git-commit-editmsg-exposure",
+        "git-logs-exposure",
+        "gitignore-exposure",
+        "gitmodules-exposure",
+        "svn-entries-exposure",
+        "mercurial-repo-exposure",
+        "composer-files-exposure",
+        "docker-files-exposure",
+        "config-json-exposure",
+        "dotenv-exposure",
+        "wp-config-exposure",
+        "sensitive-ssh-files-exposure",
+    }:
+        if soft_404:
+            return True
+
+    if template_id == "phpinfo-exposure" and (soft_404 or "phpinfo()" not in body_lower and "php version" not in body_lower):
+        return True
+
+    if template_id == "dsstore-exposure" and text_like:
+        return True
+
+    if template_id in {"backup-files-exposure", "docker-files-exposure"}:
+        if soft_404:
+            return True
+        if text_like and "zip" not in content_type and "gzip" not in content_type and "tar" not in content_type and "sql" not in content_type:
+            return True
+
+    if template_id == "directory-listing-enabled":
+        if soft_404:
+            return True
+        if "index of /" not in body_lower and "parent directory" not in body_lower:
+            return True
+
+    if template_id == "cors-wildcard-misconfig" and soft_404:
+        return True
+
+    if template_id == "wordpress-detect":
+        if soft_404:
+            return True
+        if "/wp-" not in body_lower and "wp-content" not in body_lower and "wp-includes" not in body_lower and "x-powered-by: php" not in "\n".join(f"{k}: {v}" for k, v in resp.headers.items()).lower():
+            return True
+
+    if template_id == "server-header-disclosure":
+        if not get_header_value(resp, "Server") and not get_header_value(resp, "X-Powered-By"):
+            return True
+
+    if template_id in {"cookies-missing-secure", "cookies-missing-httponly", "cookies-missing-samesite"}:
+        cookies = parse_set_cookie_headers(resp)
+        if not any(c.get("is_auth") for c in cookies):
+            return True
+
+    if template_id in {"swagger-ui-detect", "graphql-endpoint-detect", "spring-actuator-exposure", "status-endpoint-metadata", "health-endpoint-metadata", "prometheus-metrics-discovery"} and soft_404:
+        return True
+
+    if template_id == "elasticsearch-open-instance":
+        if soft_404 or '"cluster_name"' not in body_text:
+            return True
+
+    if template_id == "public-email-disclosure" and soft_404:
+        return True
+
+    if template_id == "javascript-sourcemap-exposure":
+        if soft_404:
+            return True
+        if '"version"' not in body_text and '"sources"' not in body_text:
+            return True
+
+    if template_id == "robots-txt-discovery" and soft_404:
+        return True
+
+    if template_id == "sitemap-xml-discovery" and (soft_404 or "<urlset" not in body_lower and "<sitemapindex" not in body_lower):
+        return True
+
+    if template_id == "browserconfig-xml-discovery" and (soft_404 or "<browserconfig" not in body_lower):
+        return True
+
+    if template_id in {"readme-public-discovery", "changelog-public-discovery", "license-public-discovery"}:
+        if soft_404 or not text_like:
+            return True
+
+    if template_id in {"package-lock-exposure", "pnpm-lock-exposure", "requirements-txt-discovery", "pyproject-toml-discovery", "dockerignore-public-discovery", "editorconfig-public-discovery", "env-example-public-discovery", "gitignore-public-discovery"}:
+        if soft_404:
+            return True
+
+    if template_id in {"git-commit-editmsg-exposure", "readme-public-discovery", "changelog-public-discovery", "license-public-discovery"}:
+        if content_length == "0":
+            return True
+
+    return False
+
+
 def eval_matcher(m, resp, body_text):
     mtype = m.get("type")
     part = m.get("part", "body")
@@ -1122,7 +1277,7 @@ def run_extractors(extractors, body_text, resp=None):
                     if c.get("is_auth") and flag_l not in c.get("attrs", set()):
                         found.append(f"{c.get('name')} missing {flag}")
 
-    return found[:10]
+    return flatten_extracted_items(found)[:10]
 
 
 def matches_condition(results, condition):
@@ -1173,6 +1328,8 @@ def scan_target(target, templates, timeout=8):
 
                 matcher_results = [eval_matcher(m, resp, body_text) for m in block.get("matchers", [])]
                 if matches_condition(matcher_results, matchers_cond):
+                    if should_skip_false_positive(tpl.get("id"), resp, body_text):
+                        continue
                     extracted = run_extractors(block.get("extractors"), body_text, resp)
                     findings.append({
                         "template": tpl.get("id"),

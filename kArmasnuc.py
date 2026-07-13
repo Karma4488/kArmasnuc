@@ -257,7 +257,7 @@ TEMPLATES = [
                 {"type": "word", "part": "body", "condition": "or",
                  "words": ["wp-content", "wp-includes", "wp-login.php", "/wp-json/"]},
                 {"type": "regex", "part": "header",
-                 "regex": [r"(?im)^X-Pingback:\s*.*xmlrpc\.php", r"(?im)^Link:\s*<[^>]*wp-json[^>]*>"]},
+                 "regex": [r"(?im)^X-Pingback:\s*[^\r\n]*xmlrpc\.php", r"(?im)^Link:\s*<[^>]*wp-json[^>]*>"]},
             ],
         }],
     },
@@ -436,12 +436,11 @@ TEMPLATES = [
         "http": [{
             "method": "GET",
             "path": ["/jenkins/", "/jenkins/login"],
-            "matchers-condition": "or",
+            "matchers-condition": "and",
             "matchers": [
+                {"type": "status", "status": [200, 401, 403]},
                 {"type": "word", "part": "body", "condition": "or",
                  "words": ["Jenkins", "Dashboard [Jenkins]", "Sign in [Jenkins]", "jenkins"]},
-                {"type": "regex", "part": "header", "condition": "or",
-                 "regex": [r"(?im)^X-Jenkins:\s*", r"(?im)^X-Hudson:\s*"]},
             ],
         }],
     },

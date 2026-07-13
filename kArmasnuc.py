@@ -1014,6 +1014,3811 @@ TEMPLATES = [
             ],
         }],
     },
+    {
+            "id": "sql-phpmyadmin-setup-script",
+            "info": {
+                "name": "phpMyAdmin setup script exposed",
+                "severity": "medium",
+                "tags": "panel,admin,phpmyadmin,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/phpmyadmin/scripts/setup.php",
+                        "/phpMyAdmin/scripts/setup.php"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "word",
+                            "part": "body",
+                            "condition": "or",
+                            "words": [
+                                "phpMyAdmin",
+                                "setup.php"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-phpmyadmin-config-file",
+            "info": {
+                "name": "phpMyAdmin config page exposure",
+                "severity": "medium",
+                "tags": "panel,admin,phpmyadmin,config,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/phpmyadmin/index.php?route=/server/variables",
+                        "/phpMyAdmin/index.php?route=/server/variables"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "word",
+                            "part": "body",
+                            "condition": "or",
+                            "words": [
+                                "phpMyAdmin",
+                                "Server variables"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-phpmyadmin-changelog",
+            "info": {
+                "name": "phpMyAdmin changelog exposure",
+                "severity": "info",
+                "tags": "metadata,phpmyadmin,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/phpmyadmin/ChangeLog",
+                        "/phpMyAdmin/ChangeLog",
+                        "/pma/ChangeLog"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "word",
+                            "part": "body",
+                            "condition": "or",
+                            "words": [
+                                "phpMyAdmin",
+                                "Changelog"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-adminer-standalone-file",
+            "info": {
+                "name": "Adminer standalone entrypoint exposed",
+                "severity": "medium",
+                "tags": "panel,admin,adminer,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/adminer.php",
+                        "/db/adminer.php"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "word",
+                            "part": "body",
+                            "condition": "or",
+                            "words": [
+                                "Adminer",
+                                "Login - Adminer"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-adminer-login-page",
+            "info": {
+                "name": "Adminer login page detected",
+                "severity": "medium",
+                "tags": "panel,admin,adminer,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/adminer/",
+                        "/tools/adminer/"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "word",
+                            "part": "body",
+                            "condition": "or",
+                            "words": [
+                                "Adminer",
+                                "Login - Adminer",
+                                "auth[driver]"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-pgadmin-login-page",
+            "info": {
+                "name": "pgAdmin login page detected",
+                "severity": "medium",
+                "tags": "panel,admin,pgadmin,postgresql,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/pgadmin4/login",
+                        "/pgadmin/login"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "word",
+                            "part": "body",
+                            "condition": "or",
+                            "words": [
+                                "pgAdmin 4",
+                                "login_email",
+                                "login_password"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-pgadmin-config-endpoint",
+            "info": {
+                "name": "pgAdmin misc endpoint exposure",
+                "severity": "low",
+                "tags": "panel,admin,pgadmin,postgresql,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/pgadmin4/misc/ping",
+                        "/pgadmin4/browser/"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "word",
+                            "part": "body",
+                            "condition": "or",
+                            "words": [
+                                "pgAdmin",
+                                "application/json"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-mysql-workbench-admin",
+            "info": {
+                "name": "MySQL admin/workbench web console detected",
+                "severity": "medium",
+                "tags": "panel,admin,mysql,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/mysql/",
+                        "/mysqladmin/"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200,
+                                401,
+                                403
+                            ]
+                        },
+                        {
+                            "type": "word",
+                            "part": "body",
+                            "condition": "or",
+                            "words": [
+                                "MySQL",
+                                "phpMyAdmin"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-mssql-reportserver-login",
+            "info": {
+                "name": "MSSQL Report Server login detected",
+                "severity": "medium",
+                "tags": "panel,admin,mssql,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/Reports",
+                        "/ReportServer"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200,
+                                401,
+                                403
+                            ]
+                        },
+                        {
+                            "type": "word",
+                            "part": "body",
+                            "condition": "or",
+                            "words": [
+                                "SQL Server Reporting Services",
+                                "Report Server"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-oracle-apex-login",
+            "info": {
+                "name": "Oracle APEX login detected",
+                "severity": "medium",
+                "tags": "panel,admin,oracle,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/ords/",
+                        "/i/"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "word",
+                            "part": "body",
+                            "condition": "or",
+                            "words": [
+                                "Oracle APEX",
+                                "apex_authentication",
+                                "f?p="
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-clickhouse-play-ui",
+            "info": {
+                "name": "ClickHouse web UI detected",
+                "severity": "medium",
+                "tags": "panel,admin,clickhouse,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/play",
+                        "/dashboard"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "word",
+                            "part": "body",
+                            "condition": "or",
+                            "words": [
+                                "ClickHouse",
+                                "play.clickhouse.com",
+                                "Try ClickHouse"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-dbeaver-web-panel",
+            "info": {
+                "name": "DBeaver web panel detected",
+                "severity": "low",
+                "tags": "panel,admin,dbeaver,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/dbeaver",
+                        "/dbeaver/"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200,
+                                401,
+                                403
+                            ]
+                        },
+                        {
+                            "type": "word",
+                            "part": "body",
+                            "condition": "or",
+                            "words": [
+                                "DBeaver",
+                                "CloudBeaver"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-phpmyadmin-export-page",
+            "info": {
+                "name": "phpMyAdmin export page detected",
+                "severity": "medium",
+                "tags": "panel,phpmyadmin,export,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/phpmyadmin/index.php?route=/server/export",
+                        "/phpMyAdmin/index.php?route=/server/export"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "word",
+                            "part": "body",
+                            "condition": "or",
+                            "words": [
+                                "phpMyAdmin",
+                                "Export",
+                                "SQL"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-phpmyadmin-import-page",
+            "info": {
+                "name": "phpMyAdmin import page detected",
+                "severity": "medium",
+                "tags": "panel,phpmyadmin,import,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/phpmyadmin/index.php?route=/server/import",
+                        "/phpMyAdmin/index.php?route=/server/import"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "word",
+                            "part": "body",
+                            "condition": "or",
+                            "words": [
+                                "phpMyAdmin",
+                                "Import",
+                                "SQL"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-adminer-export-page",
+            "info": {
+                "name": "Adminer export interface detected",
+                "severity": "medium",
+                "tags": "panel,adminer,export,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/adminer/?dump=1",
+                        "/adminer.php?dump=1"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "word",
+                            "part": "body",
+                            "condition": "or",
+                            "words": [
+                                "Adminer",
+                                "Export",
+                                "SQL command"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-metabase-login",
+            "info": {
+                "name": "Metabase login panel detected",
+                "severity": "medium",
+                "tags": "panel,admin,metabase,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/auth/login",
+                        "/metabase/auth/login"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "word",
+                            "part": "body",
+                            "condition": "or",
+                            "words": [
+                                "Metabase",
+                                "Sign in"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-redash-login",
+            "info": {
+                "name": "Redash login panel detected",
+                "severity": "medium",
+                "tags": "panel,admin,redash,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/login",
+                        "/redash/login"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "word",
+                            "part": "body",
+                            "condition": "or",
+                            "words": [
+                                "Redash",
+                                "Sign In"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-superset-login",
+            "info": {
+                "name": "Apache Superset login panel detected",
+                "severity": "medium",
+                "tags": "panel,admin,superset,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/superset/login/",
+                        "/login/"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "word",
+                            "part": "body",
+                            "condition": "or",
+                            "words": [
+                                "Superset",
+                                "csrf_token",
+                                "Welcome to Superset"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-db-backup-sql-file",
+            "info": {
+                "name": "Database SQL backup file exposed",
+                "severity": "high",
+                "tags": "exposure,backup,sql,database"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/db_backup.sql",
+                        "/database_backup.sql",
+                        "/backup/database_backup.sql"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)create\\s+table",
+                                "(?i)insert\\s+into",
+                                "(?i)dump completed"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-db-backup-gz-file",
+            "info": {
+                "name": "Compressed SQL backup file exposed",
+                "severity": "high",
+                "tags": "exposure,backup,sql,database"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/db_backup.sql.gz",
+                        "/database.sql.gz",
+                        "/backup.sql.gz"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "word",
+                            "part": "header",
+                            "condition": "or",
+                            "words": [
+                                "application/gzip",
+                                "application/x-gzip",
+                                "filename="
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-db-backup-zip-file",
+            "info": {
+                "name": "Archived SQL backup file exposed",
+                "severity": "high",
+                "tags": "exposure,backup,sql,database"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/db_backup.zip",
+                        "/database_backup.zip",
+                        "/sql_backup.zip"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "word",
+                            "part": "header",
+                            "condition": "or",
+                            "words": [
+                                "application/zip",
+                                "application/x-zip-compressed",
+                                "filename="
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-mysql-dump-artifact",
+            "info": {
+                "name": "MySQL dump artifact exposed",
+                "severity": "high",
+                "tags": "exposure,mysql,sql,dump"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/mysql.sql",
+                        "/mysql_dump.sql",
+                        "/dump/mysql.sql"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)--\\s*MySQL dump",
+                                "(?i)LOCK TABLES",
+                                "(?i)UNLOCK TABLES"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-postgres-dump-artifact",
+            "info": {
+                "name": "PostgreSQL dump artifact exposed",
+                "severity": "high",
+                "tags": "exposure,postgresql,sql,dump"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/postgres.sql",
+                        "/postgres_dump.sql",
+                        "/dump/postgres.sql"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)--\\s*PostgreSQL database dump",
+                                "(?i)SET search_path",
+                                "(?i)ALTER TABLE ONLY"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-mssql-bak-artifact",
+            "info": {
+                "name": "MSSQL backup artifact exposed",
+                "severity": "high",
+                "tags": "exposure,mssql,sql,backup"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/backup.bak",
+                        "/database.bak",
+                        "/db/backup.bak"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "word",
+                            "part": "body",
+                            "condition": "or",
+                            "words": [
+                                ".bak",
+                                "application/octet-stream",
+                                "Microsoft SQL Server"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-sqlite-db-file",
+            "info": {
+                "name": "SQLite database file exposed",
+                "severity": "high",
+                "tags": "exposure,sqlite,sql,database"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/db.sqlite",
+                        "/db.sqlite3",
+                        "/database.sqlite"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "word",
+                            "part": "body",
+                            "condition": "or",
+                            "words": [
+                                "SQLite format 3",
+                                "application/octet-stream"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-sqlite-backup-file",
+            "info": {
+                "name": "SQLite backup file exposed",
+                "severity": "high",
+                "tags": "exposure,sqlite,sql,backup"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/db.sqlite.bak",
+                        "/database.sqlite.bak",
+                        "/backup/db.sqlite3"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "word",
+                            "part": "body",
+                            "condition": "or",
+                            "words": [
+                                "SQLite format 3",
+                                ".sqlite"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-db-schema-sql-file",
+            "info": {
+                "name": "Database schema SQL file exposed",
+                "severity": "high",
+                "tags": "exposure,schema,sql,database"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/schema.sql",
+                        "/db/schema.sql",
+                        "/sql/schema.sql"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)create\\s+table",
+                                "(?i)create\\s+index",
+                                "(?i)constraint"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-db-structure-sql-file",
+            "info": {
+                "name": "Database structure SQL file exposed",
+                "severity": "high",
+                "tags": "exposure,structure,sql,database"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/structure.sql",
+                        "/db/structure.sql"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)create\\s+table",
+                                "(?i)primary\\s+key",
+                                "(?i)engine\\s*=\\s*innodb"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-db-data-sql-file",
+            "info": {
+                "name": "Database data SQL file exposed",
+                "severity": "high",
+                "tags": "exposure,data,sql,database"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/data.sql",
+                        "/db/data.sql",
+                        "/seed/data.sql"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)insert\\s+into",
+                                "(?i)values\\s*\\(",
+                                "(?i)transaction"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-production-sql-dump",
+            "info": {
+                "name": "Production SQL dump exposed",
+                "severity": "critical",
+                "tags": "exposure,production,sql,dump"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/prod.sql",
+                        "/production.sql",
+                        "/backup/prod.sql"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)create\\s+database",
+                                "(?i)use\\s+`?prod",
+                                "(?i)insert\\s+into"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-staging-sql-dump",
+            "info": {
+                "name": "Staging SQL dump exposed",
+                "severity": "high",
+                "tags": "exposure,staging,sql,dump"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/staging.sql",
+                        "/stage.sql",
+                        "/backup/staging.sql"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)create\\s+database",
+                                "(?i)staging",
+                                "(?i)insert\\s+into"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-old-database-backup",
+            "info": {
+                "name": "Old database backup artifact exposed",
+                "severity": "high",
+                "tags": "exposure,backup,sql,database"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/backup_old.sql",
+                        "/old_database.sql",
+                        "/db_old.sql"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)dump completed",
+                                "(?i)create\\s+table",
+                                "(?i)insert\\s+into"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-pgpass-file-exposure",
+            "info": {
+                "name": "PostgreSQL .pgpass file exposed",
+                "severity": "critical",
+                "tags": "exposure,postgresql,credentials,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/.pgpass",
+                        "/home/.pgpass"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?m)^([^:\\n]+):(\\d+|\\*):([^:\\n]+):([^:\\n]+):(.+)$"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-my-cnf-exposure",
+            "info": {
+                "name": "MySQL my.cnf configuration exposed",
+                "severity": "critical",
+                "tags": "exposure,mysql,config,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/my.cnf",
+                        "/etc/my.cnf",
+                        "/.my.cnf"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?im)^\\s*\\[client\\]",
+                                "(?im)^\\s*password\\s*=",
+                                "(?im)^\\s*user\\s*="
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-mysql-history-exposure",
+            "info": {
+                "name": "MySQL history file exposed",
+                "severity": "medium",
+                "tags": "exposure,mysql,history,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/.mysql_history",
+                        "/home/.mysql_history"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)select\\s+.+\\s+from",
+                                "(?i)update\\s+.+\\s+set",
+                                "(?i)delete\\s+from"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-psql-history-exposure",
+            "info": {
+                "name": "PostgreSQL history file exposed",
+                "severity": "medium",
+                "tags": "exposure,postgresql,history,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/.psql_history",
+                        "/home/.psql_history"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)select\\s+.+\\s+from",
+                                "(?i)\\\\c\\s+",
+                                "(?i)create\\s+table"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-sql-log-file-exposure",
+            "info": {
+                "name": "SQL log file exposed",
+                "severity": "high",
+                "tags": "exposure,logs,sql,database"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/sql.log",
+                        "/logs/sql.log",
+                        "/var/log/sql.log"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)(select|insert|update|delete)\\s+.+",
+                                "(?i)query",
+                                "(?i)rows affected"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-query-log-file-exposure",
+            "info": {
+                "name": "Database query log exposed",
+                "severity": "high",
+                "tags": "exposure,logs,sql,database"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/query.log",
+                        "/logs/query.log",
+                        "/mysql-query.log"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)query\\s+time",
+                                "(?i)(select|insert|update|delete)\\s+",
+                                "(?i)rows_examined"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-transaction-log-disclosure",
+            "info": {
+                "name": "Database transaction log exposed",
+                "severity": "high",
+                "tags": "exposure,logs,transaction,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/transaction.log",
+                        "/db/transaction.log"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)transaction",
+                                "(?i)(commit|rollback)",
+                                "(?i)session"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-db-seed-file-exposure",
+            "info": {
+                "name": "Database seed file exposed",
+                "severity": "medium",
+                "tags": "exposure,seed,sql,database"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/db/seeds.sql",
+                        "/seed.sql",
+                        "/database/seeds.sql"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)insert\\s+into",
+                                "(?i)seed",
+                                "(?i)values\\s*\\("
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-db-fixture-file-exposure",
+            "info": {
+                "name": "Database fixture SQL exposed",
+                "severity": "medium",
+                "tags": "exposure,fixture,sql,database"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/db/fixtures.sql",
+                        "/fixtures.sql",
+                        "/test/fixtures.sql"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)insert\\s+into",
+                                "(?i)fixture",
+                                "(?i)values\\s*\\("
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-export-sql-artifact",
+            "info": {
+                "name": "Exported SQL artifact exposed",
+                "severity": "high",
+                "tags": "exposure,export,sql,database"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/export.sql",
+                        "/exports/export.sql",
+                        "/sql/export.sql"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)create\\s+table",
+                                "(?i)insert\\s+into",
+                                "(?i)export"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-export-database-csv",
+            "info": {
+                "name": "Database export CSV exposed",
+                "severity": "medium",
+                "tags": "exposure,export,csv,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/export.csv",
+                        "/db_export.csv",
+                        "/exports/database.csv"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?is)(?=.*\\b(id|user_id|record_id)\\b)(?=.*\\b(email|username|name)\\b)(?=.*\\b(created_at|updated_at|timestamp)\\b)",
+                                "(?im)(table_name|schema_name|database_name|row_count|records|exported_at)",
+                                "(?i)(mysql|postgres|sqlserver|database export)"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-export-database-json",
+            "info": {
+                "name": "Database export JSON exposed",
+                "severity": "medium",
+                "tags": "exposure,export,json,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/export.json",
+                        "/db_export.json",
+                        "/exports/database.json"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)\"(id|email|created_at)\"\\s*:",
+                                "(?i)\"(users|records|rows)\"\\s*:"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-backup-directory-index",
+            "info": {
+                "name": "Backup directory listing with SQL artifacts",
+                "severity": "medium",
+                "tags": "misconfig,directory,backup,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/backup/",
+                        "/backups/",
+                        "/db_backup/"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "word",
+                            "part": "body",
+                            "condition": "or",
+                            "words": [
+                                "Index of",
+                                ".sql",
+                                ".bak"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-dump-directory-index",
+            "info": {
+                "name": "Dump directory listing exposed",
+                "severity": "medium",
+                "tags": "misconfig,directory,dump,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/dump/",
+                        "/dumps/",
+                        "/sql/"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "word",
+                            "part": "body",
+                            "condition": "or",
+                            "words": [
+                                "Index of",
+                                ".sql",
+                                "dump"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-config-database-yml",
+            "info": {
+                "name": "database.yml configuration exposure",
+                "severity": "high",
+                "tags": "exposure,config,rails,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/config/database.yml",
+                        "/database.yml"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?im)^\\s*(development|production|test):",
+                                "(?im)^\\s*adapter\\s*:\\s*",
+                                "(?im)^\\s*database\\s*:\\s*"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-config-database-yaml",
+            "info": {
+                "name": "database.yaml configuration exposure",
+                "severity": "high",
+                "tags": "exposure,config,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/config/database.yaml",
+                        "/database.yaml"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?im)^\\s*(development|production|test):",
+                                "(?im)^\\s*adapter\\s*:\\s*",
+                                "(?im)^\\s*database\\s*:\\s*"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-config-database-json",
+            "info": {
+                "name": "database.json configuration exposure",
+                "severity": "high",
+                "tags": "exposure,config,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/config/database.json",
+                        "/database.json",
+                        "/db/config.json"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)\"(database|db_name)\"\\s*:",
+                                "(?i)\"(username|user)\"\\s*:",
+                                "(?i)\"(password|passwd)\"\\s*:"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-config-db-php",
+            "info": {
+                "name": "PHP database config exposure",
+                "severity": "high",
+                "tags": "exposure,config,php,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/config/db.php",
+                        "/app/config/database.php",
+                        "/database.php"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)(mysqli?|pdo|pgsql)",
+                                "(?i)(password|passwd)\\s*=>",
+                                "(?i)(host|hostname)\\s*=>"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-config-connection-strings",
+            "info": {
+                "name": "Connection string config exposure",
+                "severity": "high",
+                "tags": "exposure,config,dsn,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/config/connection-strings.json",
+                        "/connectionStrings.config",
+                        "/appsettings.json"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)(server|host)=.+;(database|db)=",
+                                "(?i)(user\\s*id|uid)=",
+                                "(?i)(password|pwd)="
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-jdbc-properties-leak",
+            "info": {
+                "name": "JDBC properties exposure",
+                "severity": "high",
+                "tags": "exposure,config,jdbc,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/application.properties",
+                        "/config/application.properties",
+                        "/jdbc.properties"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)^\\s*spring\\.datasource\\.url\\s*=",
+                                "(?i)^\\s*spring\\.datasource\\.username\\s*=",
+                                "(?i)^\\s*spring\\.datasource\\.password\\s*="
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-jdbc-url-disclosure",
+            "info": {
+                "name": "JDBC URL disclosure",
+                "severity": "medium",
+                "tags": "exposure,jdbc,sql,dsn"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/application.yml",
+                        "/config/application.yml",
+                        "/application.yaml"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)jdbc:(mysql|postgresql|sqlserver|oracle|sqlite):",
+                                "(?i)(datasource|database):"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-odbc-ini-disclosure",
+            "info": {
+                "name": "ODBC ini configuration exposure",
+                "severity": "high",
+                "tags": "exposure,config,odbc,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/odbc.ini",
+                        "/etc/odbc.ini"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?im)^\\s*\\[.*\\]",
+                                "(?im)^\\s*Driver\\s*=",
+                                "(?im)^\\s*(Server|Database|UID|PWD)\\s*="
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-laravel-env-db-creds",
+            "info": {
+                "name": "Laravel DB credentials exposure in .env",
+                "severity": "critical",
+                "tags": "exposure,config,laravel,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/.env",
+                        "/app/.env",
+                        "/laravel/.env"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?im)^DB_CONNECTION=",
+                                "(?im)^DB_HOST=",
+                                "(?im)^DB_PASSWORD="
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-rails-database-yml",
+            "info": {
+                "name": "Rails database.yml metadata exposure",
+                "severity": "high",
+                "tags": "exposure,rails,config,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/config/database.yml"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?im)^\\s*adapter\\s*:\\s*(postgresql|mysql2|sqlite3)",
+                                "(?im)^\\s*database\\s*:\\s*",
+                                "(?im)^\\s*username\\s*:\\s*"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-django-settings-db",
+            "info": {
+                "name": "Django database settings exposure",
+                "severity": "high",
+                "tags": "exposure,django,config,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/settings.py",
+                        "/project/settings.py"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)DATABASES\\s*=\\s*\\{",
+                                "(?i)'ENGINE'\\s*:\\s*'django\\.db\\.backends",
+                                "(?i)'NAME'\\s*:\\s*"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-wordpress-db-config",
+            "info": {
+                "name": "WordPress DB configuration exposure",
+                "severity": "critical",
+                "tags": "exposure,wordpress,config,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/wp-config.php.bak",
+                        "/wp-config.php.save",
+                        "/wp-config.php~"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)DB_NAME",
+                                "(?i)DB_USER",
+                                "(?i)DB_PASSWORD"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-drupal-settings-db",
+            "info": {
+                "name": "Drupal DB configuration exposure",
+                "severity": "high",
+                "tags": "exposure,drupal,config,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/sites/default/settings.php.bak",
+                        "/sites/default/settings.php~"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)\\$databases\\s*=",
+                                "(?i)'database'\\s*=>",
+                                "(?i)'username'\\s*=>"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-magento-db-config",
+            "info": {
+                "name": "Magento DB configuration exposure",
+                "severity": "high",
+                "tags": "exposure,magento,config,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/app/etc/env.php.bak",
+                        "/app/etc/local.xml.bak"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)['\"]db['\"]\\s*=>",
+                                "(?i)['\"]connection['\"]\\s*=>\\s*['\"](default|core_setup)['\"]",
+                                "(?i)['\"](host|dbname|username|password)['\"]\\s*=>\\s*['\"].+['\"]",
+                                "(?i)(mysql|pdo_mysql)"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-dsn-parameter-disclosure",
+            "info": {
+                "name": "DSN parameter disclosure in config",
+                "severity": "high",
+                "tags": "exposure,dsn,config,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/config.ini",
+                        "/settings.ini",
+                        "/database.ini"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)(dsn|database_url)\\s*=\\s*(mysql|pgsql|sqlsrv|sqlite)",
+                                "(?i)(user(name)?|password)\\s*=\\s*"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-mysql-status-endpoint",
+            "info": {
+                "name": "MySQL status endpoint exposure",
+                "severity": "low",
+                "tags": "metadata,mysql,sql,debug"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/mysql/status",
+                        "/status/mysql",
+                        "/db/status"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "word",
+                            "part": "body",
+                            "condition": "or",
+                            "words": [
+                                "mysql",
+                                "Threads_connected",
+                                "Uptime"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-mysql-variables-endpoint",
+            "info": {
+                "name": "MySQL variables endpoint exposure",
+                "severity": "low",
+                "tags": "metadata,mysql,sql,debug"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/mysql/variables",
+                        "/db/variables",
+                        "/status/variables"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "word",
+                            "part": "body",
+                            "condition": "or",
+                            "words": [
+                                "max_connections",
+                                "sql_mode",
+                                "innodb"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-postgres-health-endpoint",
+            "info": {
+                "name": "PostgreSQL health endpoint exposure",
+                "severity": "low",
+                "tags": "metadata,postgresql,sql,debug"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/postgres/health",
+                        "/db/postgres/health",
+                        "/pg/health"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)\"database\"\\s*:\\s*\"postgres",
+                                "(?i)\"numbackends\"\\s*:",
+                                "(?i)\"max_connections\"\\s*:"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-mssql-server-info-endpoint",
+            "info": {
+                "name": "MSSQL server info endpoint exposure",
+                "severity": "low",
+                "tags": "metadata,mssql,sql,debug"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/mssql/info",
+                        "/sqlserver/info",
+                        "/db/mssql"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)SQL Server.*(version|edition)",
+                                "(?i)Microsoft SQL Server.*(version|edition)",
+                                "(?i)sqlserver.*productversion"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-database-debug-toolbar",
+            "info": {
+                "name": "Database debug toolbar exposure",
+                "severity": "medium",
+                "tags": "debug,toolbar,sql,database"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/__debug__/",
+                        "/_debugbar",
+                        "/debug"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "word",
+                            "part": "body",
+                            "condition": "or",
+                            "words": [
+                                "SQL Queries",
+                                "Debug Toolbar",
+                                "Database"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-django-debug-sql-panel",
+            "info": {
+                "name": "Django debug SQL panel exposure",
+                "severity": "medium",
+                "tags": "debug,django,sql,panel"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/__debug__/render_panel/?panel_id=SQLPanel",
+                        "/__debug__/"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "word",
+                            "part": "body",
+                            "condition": "or",
+                            "words": [
+                                "SQLPanel",
+                                "Queries",
+                                "django"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-laravel-debugbar-sql",
+            "info": {
+                "name": "Laravel Debugbar SQL collector exposure",
+                "severity": "medium",
+                "tags": "debug,laravel,sql,panel"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/_debugbar/open",
+                        "/_debugbar/assets/javascript"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "word",
+                            "part": "body",
+                            "condition": "or",
+                            "words": [
+                                "phpdebugbar",
+                                "queries",
+                                "mysql"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-symfony-profiler-doctrine",
+            "info": {
+                "name": "Symfony profiler Doctrine data exposure",
+                "severity": "medium",
+                "tags": "debug,symfony,doctrine,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/_profiler/",
+                        "/_profiler/latest?panel=db"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "word",
+                            "part": "body",
+                            "condition": "or",
+                            "words": [
+                                "Doctrine",
+                                "Database",
+                                "Queries"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-spring-actuator-datasource",
+            "info": {
+                "name": "Spring actuator datasource exposure",
+                "severity": "medium",
+                "tags": "debug,spring,actuator,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/actuator/metrics/jdbc.connections.active",
+                        "/actuator/env"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)\"name\"\\s*:\\s*\"jdbc\\.connections\\.active\"",
+                                "(?i)\"spring\\.datasource\\.(url|username|password)\"",
+                                "(?i)\"measurements\"\\s*:\\s*\\["
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-quarkus-datasource-metrics",
+            "info": {
+                "name": "Quarkus datasource metrics exposure",
+                "severity": "low",
+                "tags": "debug,quarkus,sql,metrics"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/q/metrics",
+                        "/q/health"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "word",
+                            "part": "body",
+                            "condition": "or",
+                            "words": [
+                                "datasource",
+                                "jdbc",
+                                "connections"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-grafana-sql-datasource",
+            "info": {
+                "name": "Grafana SQL datasource metadata exposure",
+                "severity": "medium",
+                "tags": "metadata,grafana,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/api/datasources",
+                        "/grafana/api/datasources"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)\"type\"\\s*:\\s*\"mysql\"",
+                                "(?i)\"type\"\\s*:\\s*\"postgres\"",
+                                "(?i)\"access\"\\s*:\\s*\"proxy\""
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-db-admin-subdomain-panel",
+            "info": {
+                "name": "Database admin panel on db subpath detected",
+                "severity": "medium",
+                "tags": "panel,admin,sql,database"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/dbadmin/",
+                        "/database-admin/",
+                        "/sqladmin/"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "word",
+                            "part": "body",
+                            "condition": "or",
+                            "words": [
+                                "SQL Admin",
+                                "dbadmin",
+                                "Adminer",
+                                "pgAdmin"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-graphql-introspection-sql-fields",
+            "info": {
+                "name": "GraphQL SQL-related schema fields exposed",
+                "severity": "low",
+                "tags": "graphql,metadata,sql,api"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/graphql",
+                        "/api/graphql"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "word",
+                            "part": "body",
+                            "condition": "or",
+                            "words": [
+                                "__schema",
+                                "GraphQL",
+                                "databaseUrl"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-openapi-sql-schema-leak",
+            "info": {
+                "name": "OpenAPI schema leaks SQL backend details",
+                "severity": "low",
+                "tags": "openapi,metadata,sql,api"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/openapi.json",
+                        "/swagger.json",
+                        "/v3/api-docs"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)jdbc:postgresql://",
+                                "(?i)jdbc:mysql://",
+                                "(?i)(server|host)=.+;(database|db)="
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-database-endpoint-swagger-example",
+            "info": {
+                "name": "Swagger examples contain SQL endpoints",
+                "severity": "low",
+                "tags": "swagger,metadata,sql,api"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/swagger-ui.html",
+                        "/swagger/index.html"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)\"/api/(db|database|sql)/",
+                                "(?i)\"operationId\"\\s*:\\s*\".*(sql|database).*\"",
+                                "(?i)\"summary\"\\s*:\\s*\".*(database|sql).*\""
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-liquibase-changelog",
+            "info": {
+                "name": "Liquibase changelog file exposure",
+                "severity": "medium",
+                "tags": "exposure,liquibase,migration,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/db/changelog/db.changelog-master.xml",
+                        "/changelog.xml"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "word",
+                            "part": "body",
+                            "condition": "or",
+                            "words": [
+                                "databaseChangeLog",
+                                "changeSet",
+                                "sql"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-flyway-history-table-dump",
+            "info": {
+                "name": "Flyway schema history dump exposure",
+                "severity": "medium",
+                "tags": "exposure,flyway,migration,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/flyway_schema_history.sql",
+                        "/db/flyway_schema_history.sql"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "word",
+                            "part": "body",
+                            "condition": "or",
+                            "words": [
+                                "flyway_schema_history",
+                                "installed_rank",
+                                "script"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-db-migration-files",
+            "info": {
+                "name": "Database migration SQL file exposure",
+                "severity": "medium",
+                "tags": "exposure,migration,sql,database"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/migrations/",
+                        "/db/migrate/",
+                        "/database/migrations/"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "word",
+                            "part": "body",
+                            "condition": "or",
+                            "words": [
+                                "Index of",
+                                ".sql"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-sql-error-disclosure-root",
+            "info": {
+                "name": "SQL error disclosure on root page",
+                "severity": "medium",
+                "tags": "exposure,error,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200,
+                                500
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)sql syntax.*mysql",
+                                "(?i)warning.*mysql_",
+                                "(?i)unclosed quotation mark after the character string",
+                                "(?i)quoted string not properly terminated",
+                                "(?i)pg_query\\(\\)",
+                                "(?i)psql:.*error",
+                                "(?i)microsoft odbc sql server driver",
+                                "(?i)sqlite\\s*error",
+                                "(?i)you have an error in your sql syntax"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-sql-error-disclosure-api",
+            "info": {
+                "name": "SQL error disclosure on API endpoint",
+                "severity": "medium",
+                "tags": "exposure,error,api,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/api",
+                        "/api/v1",
+                        "/api/v2"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200,
+                                400,
+                                500
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)sql syntax.*mysql",
+                                "(?i)warning.*mysql_",
+                                "(?i)unclosed quotation mark after the character string",
+                                "(?i)quoted string not properly terminated",
+                                "(?i)pg_query\\(\\)",
+                                "(?i)psql:.*error",
+                                "(?i)microsoft odbc sql server driver",
+                                "(?i)sqlite\\s*error",
+                                "(?i)you have an error in your sql syntax"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-sql-error-disclosure-search",
+            "info": {
+                "name": "SQL error disclosure on search endpoint",
+                "severity": "medium",
+                "tags": "exposure,error,search,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/search?q='",
+                        "/search?query='",
+                        "/api/search?q='"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200,
+                                400,
+                                500
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)sql syntax.*mysql",
+                                "(?i)warning.*mysql_",
+                                "(?i)unclosed quotation mark after the character string",
+                                "(?i)quoted string not properly terminated",
+                                "(?i)pg_query\\(\\)",
+                                "(?i)psql:.*error",
+                                "(?i)microsoft odbc sql server driver",
+                                "(?i)sqlite\\s*error",
+                                "(?i)you have an error in your sql syntax"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-sql-error-disclosure-login",
+            "info": {
+                "name": "SQL error disclosure on login endpoint",
+                "severity": "medium",
+                "tags": "exposure,error,auth,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/login",
+                        "/user/login",
+                        "/auth/login"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200,
+                                400,
+                                500
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)sql syntax.*mysql",
+                                "(?i)warning.*mysql_",
+                                "(?i)unclosed quotation mark after the character string",
+                                "(?i)quoted string not properly terminated",
+                                "(?i)pg_query\\(\\)",
+                                "(?i)psql:.*error",
+                                "(?i)microsoft odbc sql server driver",
+                                "(?i)sqlite\\s*error",
+                                "(?i)you have an error in your sql syntax"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-sql-error-disclosure-register",
+            "info": {
+                "name": "SQL error disclosure on register endpoint",
+                "severity": "medium",
+                "tags": "exposure,error,auth,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/register",
+                        "/signup",
+                        "/user/register"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200,
+                                400,
+                                500
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)sql syntax.*mysql",
+                                "(?i)warning.*mysql_",
+                                "(?i)unclosed quotation mark after the character string",
+                                "(?i)quoted string not properly terminated",
+                                "(?i)pg_query\\(\\)",
+                                "(?i)psql:.*error",
+                                "(?i)microsoft odbc sql server driver",
+                                "(?i)sqlite\\s*error",
+                                "(?i)you have an error in your sql syntax"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-sql-error-disclosure-filter",
+            "info": {
+                "name": "SQL error disclosure on filter endpoint",
+                "severity": "medium",
+                "tags": "exposure,error,filter,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/products?sort='",
+                        "/items?filter='",
+                        "/api/items?order='"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200,
+                                400,
+                                500
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)sql syntax.*mysql",
+                                "(?i)warning.*mysql_",
+                                "(?i)unclosed quotation mark after the character string",
+                                "(?i)quoted string not properly terminated",
+                                "(?i)pg_query\\(\\)",
+                                "(?i)psql:.*error",
+                                "(?i)microsoft odbc sql server driver",
+                                "(?i)sqlite\\s*error",
+                                "(?i)you have an error in your sql syntax"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-sql-error-disclosure-graphql",
+            "info": {
+                "name": "SQL error disclosure on GraphQL endpoint",
+                "severity": "medium",
+                "tags": "exposure,error,graphql,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/graphql",
+                        "/api/graphql"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200,
+                                400,
+                                500
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)sql syntax.*mysql",
+                                "(?i)warning.*mysql_",
+                                "(?i)unclosed quotation mark after the character string",
+                                "(?i)quoted string not properly terminated",
+                                "(?i)pg_query\\(\\)",
+                                "(?i)psql:.*error",
+                                "(?i)microsoft odbc sql server driver",
+                                "(?i)sqlite\\s*error",
+                                "(?i)you have an error in your sql syntax"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-sql-error-disclosure-rest",
+            "info": {
+                "name": "SQL error disclosure on REST endpoint",
+                "severity": "medium",
+                "tags": "exposure,error,rest,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/api/users?id='",
+                        "/api/orders?id='"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200,
+                                400,
+                                500
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)sql syntax.*mysql",
+                                "(?i)warning.*mysql_",
+                                "(?i)unclosed quotation mark after the character string",
+                                "(?i)quoted string not properly terminated",
+                                "(?i)pg_query\\(\\)",
+                                "(?i)psql:.*error",
+                                "(?i)microsoft odbc sql server driver",
+                                "(?i)sqlite\\s*error",
+                                "(?i)you have an error in your sql syntax"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-mysql-syntax-error-message",
+            "info": {
+                "name": "MySQL syntax error message disclosure",
+                "severity": "medium",
+                "tags": "exposure,error,mysql,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/",
+                        "/index.php?id='"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200,
+                                500
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)sql syntax.*mysql",
+                                "(?i)warning.*mysql_",
+                                "(?i)unclosed quotation mark after the character string",
+                                "(?i)quoted string not properly terminated",
+                                "(?i)pg_query\\(\\)",
+                                "(?i)psql:.*error",
+                                "(?i)microsoft odbc sql server driver",
+                                "(?i)sqlite\\s*error",
+                                "(?i)you have an error in your sql syntax",
+                                "(?i)mysql_fetch_array",
+                                "(?i)mysqli_sql_exception"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-postgres-syntax-error-message",
+            "info": {
+                "name": "PostgreSQL syntax error message disclosure",
+                "severity": "medium",
+                "tags": "exposure,error,postgresql,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/",
+                        "/posts?id='"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200,
+                                500
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)sql syntax.*mysql",
+                                "(?i)warning.*mysql_",
+                                "(?i)unclosed quotation mark after the character string",
+                                "(?i)quoted string not properly terminated",
+                                "(?i)pg_query\\(\\)",
+                                "(?i)psql:.*error",
+                                "(?i)microsoft odbc sql server driver",
+                                "(?i)sqlite\\s*error",
+                                "(?i)you have an error in your sql syntax",
+                                "(?i)postgresql.*error",
+                                "(?i)pg::syntaxerror"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-mssql-syntax-error-message",
+            "info": {
+                "name": "MSSQL syntax error message disclosure",
+                "severity": "medium",
+                "tags": "exposure,error,mssql,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/",
+                        "/news?id='"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200,
+                                500
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)sql syntax.*mysql",
+                                "(?i)warning.*mysql_",
+                                "(?i)unclosed quotation mark after the character string",
+                                "(?i)quoted string not properly terminated",
+                                "(?i)pg_query\\(\\)",
+                                "(?i)psql:.*error",
+                                "(?i)microsoft odbc sql server driver",
+                                "(?i)sqlite\\s*error",
+                                "(?i)you have an error in your sql syntax",
+                                "(?i)sqlserverexception",
+                                "(?i)microsoft sql native client"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-oracle-syntax-error-message",
+            "info": {
+                "name": "Oracle SQL error message disclosure",
+                "severity": "medium",
+                "tags": "exposure,error,oracle,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/",
+                        "/article?id='"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200,
+                                500
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)sql syntax.*mysql",
+                                "(?i)warning.*mysql_",
+                                "(?i)unclosed quotation mark after the character string",
+                                "(?i)quoted string not properly terminated",
+                                "(?i)pg_query\\(\\)",
+                                "(?i)psql:.*error",
+                                "(?i)microsoft odbc sql server driver",
+                                "(?i)sqlite\\s*error",
+                                "(?i)you have an error in your sql syntax",
+                                "(?i)ORA-00933",
+                                "(?i)ORA-01756"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-sqlite-error-message",
+            "info": {
+                "name": "SQLite error message disclosure",
+                "severity": "medium",
+                "tags": "exposure,error,sqlite,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/",
+                        "/page?id='"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200,
+                                500
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)sql syntax.*mysql",
+                                "(?i)warning.*mysql_",
+                                "(?i)unclosed quotation mark after the character string",
+                                "(?i)quoted string not properly terminated",
+                                "(?i)pg_query\\(\\)",
+                                "(?i)psql:.*error",
+                                "(?i)microsoft odbc sql server driver",
+                                "(?i)sqlite\\s*error",
+                                "(?i)you have an error in your sql syntax",
+                                "(?i)SQLiteException",
+                                "(?i)near \".*\": syntax error"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-jdbc-stacktrace-disclosure",
+            "info": {
+                "name": "JDBC SQL stack trace disclosure",
+                "severity": "medium",
+                "tags": "exposure,error,jdbc,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/",
+                        "/api"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200,
+                                500
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)sql syntax.*mysql",
+                                "(?i)warning.*mysql_",
+                                "(?i)unclosed quotation mark after the character string",
+                                "(?i)quoted string not properly terminated",
+                                "(?i)pg_query\\(\\)",
+                                "(?i)psql:.*error",
+                                "(?i)microsoft odbc sql server driver",
+                                "(?i)sqlite\\s*error",
+                                "(?i)you have an error in your sql syntax",
+                                "(?i)java\\.sql\\.SQLException",
+                                "(?i)jdbc:"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-hibernate-sql-disclosure",
+            "info": {
+                "name": "Hibernate SQL exception disclosure",
+                "severity": "medium",
+                "tags": "exposure,error,hibernate,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/",
+                        "/api"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200,
+                                500
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)sql syntax.*mysql",
+                                "(?i)warning.*mysql_",
+                                "(?i)unclosed quotation mark after the character string",
+                                "(?i)quoted string not properly terminated",
+                                "(?i)pg_query\\(\\)",
+                                "(?i)psql:.*error",
+                                "(?i)microsoft odbc sql server driver",
+                                "(?i)sqlite\\s*error",
+                                "(?i)you have an error in your sql syntax",
+                                "(?i)org\\.hibernate\\.exception",
+                                "(?i)could not execute statement"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-sequelize-sql-disclosure",
+            "info": {
+                "name": "Sequelize SQL error disclosure",
+                "severity": "medium",
+                "tags": "exposure,error,sequelize,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/",
+                        "/api"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200,
+                                500
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)sql syntax.*mysql",
+                                "(?i)warning.*mysql_",
+                                "(?i)unclosed quotation mark after the character string",
+                                "(?i)quoted string not properly terminated",
+                                "(?i)pg_query\\(\\)",
+                                "(?i)psql:.*error",
+                                "(?i)microsoft odbc sql server driver",
+                                "(?i)sqlite\\s*error",
+                                "(?i)you have an error in your sql syntax",
+                                "(?i)SequelizeDatabaseError",
+                                "(?i)original:\\s*error"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-sqlalchemy-error-disclosure",
+            "info": {
+                "name": "SQLAlchemy error disclosure",
+                "severity": "medium",
+                "tags": "exposure,error,sqlalchemy,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/",
+                        "/api"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200,
+                                500
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)sql syntax.*mysql",
+                                "(?i)warning.*mysql_",
+                                "(?i)unclosed quotation mark after the character string",
+                                "(?i)quoted string not properly terminated",
+                                "(?i)pg_query\\(\\)",
+                                "(?i)psql:.*error",
+                                "(?i)microsoft odbc sql server driver",
+                                "(?i)sqlite\\s*error",
+                                "(?i)you have an error in your sql syntax",
+                                "(?i)sqlalchemy\\.exc",
+                                "(?i)statement:\\s*select"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-entityframework-sql-error",
+            "info": {
+                "name": "Entity Framework SQL error disclosure",
+                "severity": "medium",
+                "tags": "exposure,error,entityframework,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/",
+                        "/api"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200,
+                                500
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)sql syntax.*mysql",
+                                "(?i)warning.*mysql_",
+                                "(?i)unclosed quotation mark after the character string",
+                                "(?i)quoted string not properly terminated",
+                                "(?i)pg_query\\(\\)",
+                                "(?i)psql:.*error",
+                                "(?i)microsoft odbc sql server driver",
+                                "(?i)sqlite\\s*error",
+                                "(?i)you have an error in your sql syntax",
+                                "(?i)EntityFramework",
+                                "(?i)SqlException"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-prisma-sql-error",
+            "info": {
+                "name": "Prisma SQL error disclosure",
+                "severity": "medium",
+                "tags": "exposure,error,prisma,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/",
+                        "/api"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200,
+                                500
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)sql syntax.*mysql",
+                                "(?i)warning.*mysql_",
+                                "(?i)unclosed quotation mark after the character string",
+                                "(?i)quoted string not properly terminated",
+                                "(?i)pg_query\\(\\)",
+                                "(?i)psql:.*error",
+                                "(?i)microsoft odbc sql server driver",
+                                "(?i)sqlite\\s*error",
+                                "(?i)you have an error in your sql syntax",
+                                "(?i)PrismaClientKnownRequestError",
+                                "(?i)P10\\d{2}",
+                                "(?i)P20\\d{2}"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-knex-sql-error",
+            "info": {
+                "name": "Knex SQL error disclosure",
+                "severity": "medium",
+                "tags": "exposure,error,knex,sql"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/",
+                        "/api"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200,
+                                500
+                            ]
+                        },
+                        {
+                            "type": "regex",
+                            "part": "body",
+                            "condition": "or",
+                            "regex": [
+                                "(?i)sql syntax.*mysql",
+                                "(?i)warning.*mysql_",
+                                "(?i)unclosed quotation mark after the character string",
+                                "(?i)quoted string not properly terminated",
+                                "(?i)pg_query\\(\\)",
+                                "(?i)psql:.*error",
+                                "(?i)microsoft odbc sql server driver",
+                                "(?i)sqlite\\s*error",
+                                "(?i)you have an error in your sql syntax",
+                                "(?i)KnexTimeoutError",
+                                "(?i)Undefined binding\\(s\\)"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "sql-mysql-performance-schema",
+            "info": {
+                "name": "MySQL performance schema endpoint exposure",
+                "severity": "low",
+                "tags": "metadata,mysql,sql,debug"
+            },
+            "http": [
+                {
+                    "method": "GET",
+                    "path": [
+                        "/mysql/performance",
+                        "/performance_schema"
+                    ],
+                    "matchers-condition": "and",
+                    "matchers": [
+                        {
+                            "type": "status",
+                            "status": [
+                                200
+                            ]
+                        },
+                        {
+                            "type": "word",
+                            "part": "body",
+                            "condition": "or",
+                            "words": [
+                                "performance_schema",
+                                "events_statements",
+                                "threads"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
 ]
 
 

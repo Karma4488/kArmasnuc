@@ -770,7 +770,7 @@ TEMPLATES = [
                 {"type": "status", "status": [200]},
                 {"type": "regex", "part": "body", "condition": "or",
                  "regex": [r"(?i)symfony\s*profiler", r"(?i)sfwebdebug",
-                            r"(?i)Symfony\s*\\s*Web\s*Debug"]},
+                            r"(?i)Symfony\s*Web\s*Debug"]},
             ],
         }],
     },

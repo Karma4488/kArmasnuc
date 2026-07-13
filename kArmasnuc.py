@@ -1763,7 +1763,11 @@ def run_extractors(extractors, body_text, resp=None):
             matches = re.findall(p, body_text)
             for match in matches if isinstance(matches, list) else [matches]:
                 if isinstance(match, tuple):
-                    match = "=".join(str(part) for part in match if part not in (None, ""))
+                    parts = [str(part) for part in match if part not in (None, "")]
+                    if len(parts) == 2 and re.fullmatch(r"[A-Z0-9_]+", parts[0], re.IGNORECASE):
+                        match = f"{parts[0]}={parts[1]}"
+                    else:
+                        match = " | ".join(parts)
                 else:
                     match = str(match)
                 if match:
@@ -1896,7 +1900,7 @@ def main():
     ap.add_argument("-u", "--url", help="single target URL")
     ap.add_argument("-l", "--list", help="file of target URLs (one per line)")
     ap.add_argument("-c", "--concurrency", type=int, default=20, help="concurrent target workers")
-    ap.add_argument("-timeout", type=int, default=8, help="per-request timeout (seconds)")
+    ap.add_argument("-timeout", "--timeout", type=int, default=8, help="per-request timeout (seconds)")
     ap.add_argument("-severity", help="comma-separated severities to include (info,low,medium,high,critical)")
     ap.add_argument("-tags", help="comma-separated tags to include")
     ap.add_argument("-o", "--output", help="output file (.json, .csv, or .txt)")
@@ -1910,7 +1914,7 @@ def main():
     if args.concurrency < 1:
         ap.error("-c/--concurrency must be at least 1")
     if args.timeout < 1:
-        ap.error("-timeout must be at least 1")
+        ap.error("-timeout/--timeout must be at least 1")
 
     severities = set(s.strip().lower() for s in args.severity.split(",")) if args.severity else None
     tags = set(s.strip().lower() for s in args.tags.split(",")) if args.tags else None

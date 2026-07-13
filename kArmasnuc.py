@@ -45,6 +45,8 @@ CYAN = "\033[96m"
 GREY = "\033[90m"
 RESET = "\033[0m"
 BOLD = "\033[1m"
+KEY_VALUE_TUPLE_SIZE = 2
+TUPLE_SEPARATOR = " | "
 
 BANNER = f"""{GREEN}{BOLD}
         ██╗  ██╗ █████╗ ██████╗ ███╗   ███╗ █████╗ ███████╗
@@ -1764,10 +1766,10 @@ def run_extractors(extractors, body_text, resp=None):
             for match in matches if isinstance(matches, list) else [matches]:
                 if isinstance(match, tuple):
                     parts = [str(part) for part in match if part not in (None, "")]
-                    if len(parts) == 2 and re.fullmatch(r"[A-Z0-9_]+", parts[0], re.IGNORECASE):
+                    if len(parts) == KEY_VALUE_TUPLE_SIZE and re.fullmatch(r"[A-Z0-9_]+", parts[0], re.IGNORECASE):
                         match = f"{parts[0]}={parts[1]}"
                     else:
-                        match = " | ".join(parts)
+                        match = TUPLE_SEPARATOR.join(parts)
                 else:
                     match = str(match)
                 if match:

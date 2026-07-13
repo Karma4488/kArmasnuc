@@ -317,6 +317,7 @@ TEMPLATES = [
             ],
         }],
     },
+<<<<<<< HEAD
 
     # ------------------------------------------------------------------ #
     # VCS / Source Control Exposure
@@ -417,15 +418,28 @@ TEMPLATES = [
         "http": [{
             "method": "GET",
             "path": ["/.hg/requires"],
+=======
+    {
+        "id": "svn-entries-exposure",
+        "info": {"name": "Exposed Subversion metadata", "severity": "high", "tags": "exposure,svn,config"},
+        "http": [{
+            "method": "GET",
+            "path": ["/.svn/entries"],
+>>>>>>> origin/main
             "matchers-condition": "and",
             "matchers": [
                 {"type": "status", "status": [200]},
                 {"type": "regex", "part": "body", "condition": "or",
+<<<<<<< HEAD
                  "regex": [r"(?i)revlogv1", r"(?i)store", r"(?i)fncache"]},
+=======
+                 "regex": [r"(?m)^dir\s*$", r"(?m)^\d+\s*$", r"(?m)^svn:.*$"]},
+>>>>>>> origin/main
             ],
         }],
     },
     {
+<<<<<<< HEAD
         "id": "hg-hgrc-exposure",
         "info": {"name": "Exposed .hg/hgrc (Mercurial config)", "severity": "high",
                   "tags": "exposure,mercurial,vcs"},
@@ -1656,6 +1670,8 @@ TEMPLATES = [
     # OSINT / Reconnaissance Templates
     # ------------------------------------------------------------------ #
     {
+=======
+>>>>>>> origin/main
         "id": "mercurial-repo-exposure",
         "info": {"name": "Exposed Mercurial repository metadata", "severity": "high", "tags": "exposure,hg,config"},
         "http": [{
@@ -1692,6 +1708,23 @@ TEMPLATES = [
         }],
     },
     {
+<<<<<<< HEAD
+=======
+        "id": "npmrc-exposure",
+        "info": {"name": "Exposed .npmrc file", "severity": "critical", "tags": "exposure,npm,secrets"},
+        "http": [{
+            "method": "GET",
+            "path": ["/.npmrc"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?i)_authToken\s*=", r"(?i)//registry\..*:_(auth|password)\s*="]},
+            ],
+        }],
+    },
+    {
+>>>>>>> origin/main
         "id": "composer-files-exposure",
         "info": {"name": "Exposed Composer manifest / lock file", "severity": "medium", "tags": "exposure,php,composer"},
         "http": [{
@@ -2015,6 +2048,23 @@ TEMPLATES = [
         }],
     },
     {
+<<<<<<< HEAD
+=======
+        "id": "package-json-exposure",
+        "info": {"name": "Public package.json metadata", "severity": "info", "tags": "osint,recon,metadata,nodejs"},
+        "http": [{
+            "method": "GET",
+            "path": ["/package.json"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r'"name"\s*:', r'"version"\s*:', r'"dependencies"\s*:']},
+            ],
+        }],
+    },
+    {
+>>>>>>> origin/main
         "id": "package-lock-exposure",
         "info": {"name": "Public package-lock metadata", "severity": "info", "tags": "osint,recon,metadata,nodejs"},
         "http": [{
@@ -2029,6 +2079,23 @@ TEMPLATES = [
         }],
     },
     {
+<<<<<<< HEAD
+=======
+        "id": "yarn-lock-exposure",
+        "info": {"name": "Public yarn.lock metadata", "severity": "info", "tags": "osint,recon,metadata,nodejs"},
+        "http": [{
+            "method": "GET",
+            "path": ["/yarn.lock"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?m)^# yarn lockfile", r'(?m)^"?[^"\n]+@[^:\n]+:\s*$']},
+            ],
+        }],
+    },
+    {
+>>>>>>> origin/main
         "id": "pnpm-lock-exposure",
         "info": {"name": "Public pnpm lock metadata", "severity": "info", "tags": "osint,recon,metadata,nodejs"},
         "http": [{

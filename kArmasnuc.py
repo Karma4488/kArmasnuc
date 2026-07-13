@@ -1761,7 +1761,13 @@ def run_extractors(extractors, body_text, resp=None):
     for ex in extractors or []:
         for p in ex.get("regex", []):
             matches = re.findall(p, body_text)
-            found.extend(matches if isinstance(matches, list) else [matches])
+            for match in matches if isinstance(matches, list) else [matches]:
+                if isinstance(match, tuple):
+                    match = "=".join(str(part) for part in match if part not in (None, ""))
+                else:
+                    match = str(match)
+                if match:
+                    found.append(match)
 
         if resp is not None:
             for flag in ex.get("cookie_flag_missing", []):
@@ -1901,6 +1907,11 @@ def main():
     if not args.silent:
         print(BANNER)
 
+    if args.concurrency < 1:
+        ap.error("-c/--concurrency must be at least 1")
+    if args.timeout < 1:
+        ap.error("-timeout must be at least 1")
+
     severities = set(s.strip().lower() for s in args.severity.split(",")) if args.severity else None
     tags = set(s.strip().lower() for s in args.tags.split(",")) if args.tags else None
     templates = filter_templates(TEMPLATES, severities, tags)
@@ -1916,8 +1927,14 @@ def main():
     if args.url:
         targets.append(args.url.strip())
     if args.list:
-        with open(args.list) as f:
-            targets.extend([line.strip() for line in f if line.strip()])
+        try:
+            with open(args.list) as f:
+                targets.extend([line.strip() for line in f if line.strip()])
+        except OSError as exc:
+            ap.error(f"unable to read target list '{args.list}': {exc}")
+
+    if not targets:
+        ap.error("no valid targets were provided")
 
     if not templates:
         print(f"{RED}[!] no templates matched the given severity/tag filters{RESET}")

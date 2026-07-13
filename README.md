@@ -1,4 +1,4 @@
-# kArmasnuc
+# kArmas_nuc
 
 kArmasnuc — template-driven web detection scanner (Nuclei-inspired)
 Part of the kArmas suite. Single-file build — no external template files,

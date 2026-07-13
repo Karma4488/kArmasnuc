@@ -19,6 +19,7 @@ import argparse
 import concurrent.futures
 import json
 import os
+import random
 import re
 import sys
 import time
@@ -60,6 +61,67 @@ SEVERITY_COLOR = {
     "high": RED,
     "critical": BOLD + RED,
 }
+
+# Matrix rain characters (katakana + ASCII)
+_MATRIX_CHARS = (
+    "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン"
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*"
+)
+_DIM_GREEN  = "\033[32m"   # dim green for trails
+_FAINT      = "\033[2;32m" # faint green for fade
+
+
+def matrix_rain(duration: float = 1.5) -> None:
+    """Display a brief Matrix-style falling-character animation, then clear."""
+    if not sys.stdout.isatty():
+        return
+    try:
+        import shutil
+        ts   = shutil.get_terminal_size(fallback=(80, 24))
+        cols = ts.columns
+        rows = max(ts.lines - 1, 4)
+    except Exception:
+        cols, rows = 80, 24
+
+    # per-column state: current head row position
+    heads  = [random.randint(-rows, 0) for _ in range(cols)]
+    # speed 1 (slower) is twice as likely as speed 2 for a natural look
+    speeds = [random.choices([1, 2], weights=[2, 1])[0] for _ in range(cols)]
+
+    # hide cursor, switch to alternate screen buffer
+    sys.stdout.write("\033[?25l\033[?1049h\033[2J")
+    sys.stdout.flush()
+
+    _FRAME_DELAY = 0.045  # ~22 FPS for smooth animation
+    deadline = time.monotonic() + duration
+    try:
+        while time.monotonic() < deadline:
+            buf = []
+            for col in range(cols):
+                head = heads[col]
+                # bright green head character
+                if 0 <= head < rows:
+                    buf.append(f"\033[{head + 1};{col + 1}H{GREEN}{BOLD}{random.choice(_MATRIX_CHARS)}{RESET}")
+                # dim green trail (1-6 rows behind head)
+                for offset in range(1, 7):
+                    trail = head - offset
+                    if 0 <= trail < rows:
+                        intensity = _DIM_GREEN if offset <= 3 else _FAINT
+                        buf.append(f"\033[{trail + 1};{col + 1}H{intensity}{random.choice(_MATRIX_CHARS)}{RESET}")
+                # erase cell well behind the head
+                erase = head - 8
+                if 0 <= erase < rows:
+                    buf.append(f"\033[{erase + 1};{col + 1}H ")
+                heads[col] = head + speeds[col]
+                if heads[col] > rows + 8:
+                    heads[col] = random.randint(-rows, 0)
+            sys.stdout.write("".join(buf))
+            sys.stdout.flush()
+            time.sleep(_FRAME_DELAY)
+    finally:
+        # restore: clear alternate buffer, switch back, show cursor
+        sys.stdout.write("\033[2J\033[?1049l\033[?25h")
+        sys.stdout.flush()
 
 SOFT_404_BODY_PATTERNS = [
     r"(?i)<title>\s*(404|not found|error|access denied|forbidden)",
@@ -5224,6 +5286,7 @@ def main():
     args = ap.parse_args()
 
     if not args.silent:
+        matrix_rain()
         print(BANNER)
 
     severities = set(s.strip().lower() for s in args.severity.split(",")) if args.severity else None

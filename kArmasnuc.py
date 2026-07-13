@@ -47,6 +47,7 @@ RESET = "\033[0m"
 BOLD = "\033[1m"
 KEY_VALUE_TUPLE_SIZE = 2
 TUPLE_SEPARATOR = " | "
+KEY_VALUE_PATTERN = re.compile(r"[A-Za-z0-9_]+")
 
 BANNER = f"""{GREEN}{BOLD}
         ██╗  ██╗ █████╗ ██████╗ ███╗   ███╗ █████╗ ███████╗
@@ -1758,22 +1759,23 @@ def eval_matcher(m, resp, body_text):
     return (not result) if negative else result
 
 
+def normalize_extracted_match(match):
+    if isinstance(match, tuple):
+        parts = [str(part) for part in match if part not in (None, "")]
+        if len(parts) == KEY_VALUE_TUPLE_SIZE and KEY_VALUE_PATTERN.fullmatch(parts[0]):
+            return f"{parts[0]}={parts[1]}"  # format common key/value captures readably
+        return TUPLE_SEPARATOR.join(parts)
+    return str(match)
+
+
 def run_extractors(extractors, body_text, resp=None):
     found = []
     for ex in extractors or []:
         for p in ex.get("regex", []):
-            matches = re.findall(p, body_text)
-            for match in matches if isinstance(matches, list) else [matches]:
-                if isinstance(match, tuple):
-                    parts = [str(part) for part in match if part not in (None, "")]
-                    if len(parts) == KEY_VALUE_TUPLE_SIZE and re.fullmatch(r"[A-Z0-9_]+", parts[0], re.IGNORECASE):
-                        match = f"{parts[0]}={parts[1]}"
-                    else:
-                        match = TUPLE_SEPARATOR.join(parts)
-                else:
-                    match = str(match)
-                if match:
-                    found.append(match)
+            for match in re.findall(p, body_text):
+                normalized = normalize_extracted_match(match)
+                if normalized:
+                    found.append(normalized)
 
         if resp is not None:
             for flag in ex.get("cookie_flag_missing", []):

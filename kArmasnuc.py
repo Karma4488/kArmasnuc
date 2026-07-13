@@ -5,8 +5,7 @@ Part of the kArmas suite. Single-file build — no external template files,
 no YAML dependency. Everything (engine + templates) lives in this script.
 
 Passive/detection only: fingerprints exposed files, misconfigurations,
-and missing security headers. Does NOT exploit, brute force credentials,
-or send destructive payloads.
+and missing security headers. 
 
 Requirements:
     pip install requests --break-system-packages

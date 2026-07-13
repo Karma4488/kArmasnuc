@@ -47,7 +47,7 @@ RESET = "\033[0m"
 BOLD = "\033[1m"
 KEY_VALUE_TUPLE_SIZE = 2
 TUPLE_SEPARATOR = " | "
-KEY_VALUE_PATTERN = re.compile(r"[A-Za-z0-9_]+")
+KEY_VALUE_PATTERN = re.compile(r"[^=\s]+")
 
 BANNER = f"""{GREEN}{BOLD}
         ██╗  ██╗ █████╗ ██████╗ ███╗   ███╗ █████╗ ███████╗

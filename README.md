@@ -1,4 +1,5 @@
 # kArmasnuc
 
-templates scanner
+template scanner
+
 

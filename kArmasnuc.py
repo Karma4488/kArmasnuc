@@ -328,7 +328,7 @@ TEMPLATES = [
         "info": {"name": "Exposed Subversion metadata", "severity": "high", "tags": "exposure,svn,config"},
         "http": [{
             "method": "GET",
-            "path": ["/.svn/entries"],
+            "path": ["/.svn/entries", "/.svn/wc.db"],
             "matchers-condition": "and",
             "matchers": [
                 {"type": "status", "status": [200]},

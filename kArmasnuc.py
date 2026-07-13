@@ -1761,10 +1761,12 @@ def eval_matcher(m, resp, body_text):
 
 def normalize_extracted_match(match):
     if isinstance(match, tuple):
-        parts = [str(part) for part in match if part not in (None, "")]
-        if len(parts) == KEY_VALUE_TUPLE_SIZE and KEY_VALUE_PATTERN.fullmatch(parts[0]):
-            return f"{parts[0]}={parts[1]}"  # format common key/value captures readably
-        return TUPLE_SEPARATOR.join(parts)
+        parts = ["" if part is None else str(part) for part in match]
+        if len(parts) == KEY_VALUE_TUPLE_SIZE and parts[0] and KEY_VALUE_PATTERN.fullmatch(parts[0]):
+            return f"{parts[0]}={parts[1]}"  # format common two-group key/value captures readably
+        return TUPLE_SEPARATOR.join(part for part in parts if part)
+    if match is None:
+        return None
     return str(match)
 
 
@@ -1774,7 +1776,7 @@ def run_extractors(extractors, body_text, resp=None):
         for p in ex.get("regex", []):
             for match in re.findall(p, body_text):
                 normalized = normalize_extracted_match(match)
-                if normalized:
+                if normalized not in (None, ""):
                     found.append(normalized)
 
         if resp is not None:

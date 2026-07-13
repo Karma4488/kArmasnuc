@@ -5,8 +5,7 @@ Part of the kArmas suite. Single-file build — no external template files,
 no YAML dependency. Everything (engine + templates) lives in this script.
 
 Passive/detection only: fingerprints exposed files, misconfigurations,
-and missing security headers. Does NOT exploit, brute force credentials,
-or send destructive payloads.
+and missing security headers. 
 
 Requirements:
     pip install requests --break-system-packages
@@ -65,11 +64,28 @@ SEVERITY_COLOR = {
     "critical": BOLD + RED,
 }
 
+SOFT_404_BODY_PATTERNS = [
+    r"(?i)<title>\s*(404|not found|error|access denied|forbidden)",
+    r"(?i)\b(404|page not found|not found|access denied|forbidden)\b",
+    r"(?i)the requested url was not found",
+    r"(?i)cannot (get|post) /",
+]
+
+TEXT_LIKE_CONTENT_TYPES = (
+    "text/",
+    "application/json",
+    "application/javascript",
+    "application/x-javascript",
+    "application/xml",
+    "application/xhtml+xml",
+    "application/x-httpd-php",
+    "application/x-sh",
+    "application/x-yaml",
+    "application/yaml",
+)
+
 # ------------------------------------------------------------------ #
 # Embedded templates
-# Same structure that used to live in templates/*.yaml, now inline as
-# native Python dicts. Add new checks by appending to this list — no
-# separate files needed.
 # ------------------------------------------------------------------ #
 TEMPLATES = [
     {
@@ -324,6 +340,72 @@ TEMPLATES = [
         }],
     },
     {
+        "id": "git-head-exposure",
+        "info": {"name": "Exposed .git/HEAD file", "severity": "high", "tags": "exposure,git,vcs"},
+        "http": [{
+            "method": "GET",
+            "path": ["/.git/HEAD"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "regex": [r"ref:\s*refs/heads/"]},
+            ],
+        }],
+    },
+    {
+        "id": "git-commit-editmsg-exposure",
+        "info": {"name": "Exposed .git/COMMIT_EDITMSG", "severity": "medium", "tags": "exposure,git,vcs"},
+        "http": [{
+            "method": "GET",
+            "path": ["/.git/COMMIT_EDITMSG"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "header", "regex": [r"(?i)Content-Type:\s*text/plain"]},
+            ],
+        }],
+    },
+    {
+        "id": "git-logs-exposure",
+        "info": {"name": "Exposed .git/logs/HEAD", "severity": "medium", "tags": "exposure,git,vcs"},
+        "http": [{
+            "method": "GET",
+            "path": ["/.git/logs/HEAD"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "regex": [r"[0-9a-f]{40}"]},
+            ],
+        }],
+    },
+    {
+        "id": "gitignore-exposure",
+        "info": {"name": "Exposed .gitignore (path disclosure)", "severity": "low", "tags": "exposure,git,vcs"},
+        "http": [{
+            "method": "GET",
+            "path": ["/.gitignore"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?m)^\s*[#*!]", r"(?m)^\s*\*\.\w+", r"(?m)^/?[\w./-]+(\.[\w]+)?$"]},
+            ],
+        }],
+    },
+    {
+        "id": "gitmodules-exposure",
+        "info": {"name": "Exposed .gitmodules (submodule path/URL disclosure)", "severity": "low", "tags": "exposure,git,vcs"},
+        "http": [{
+            "method": "GET",
+            "path": ["/.gitmodules"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "word", "part": "body", "words": ["[submodule"]},
+            ],
+        }],
+    },
+    {
         "id": "svn-entries-exposure",
         "info": {"name": "Exposed Subversion metadata", "severity": "high", "tags": "exposure,svn,config"},
         "http": [{
@@ -364,26 +446,12 @@ TEMPLATES = [
                 {"type": "status", "status": [200]},
                 {"type": "regex", "part": "body", "condition": "or",
                  "regex": [
-                     r"""(?i)['"]?api[_-]?key['"]?\s*:\s*['"](?!test|xxxx|changeme|sample|demo)[^'"]{8,}['"]""",
-                     r"""(?i)['"]?client[_-]?secret['"]?\s*:\s*['"](?!test|xxxx|changeme|sample|demo)[^'"]{8,}['"]""",
-                     r"""(?i)['"]?jwt[_-]?secret['"]?\s*:\s*['"](?!test|xxxx|changeme|sample|demo)[^'"]{8,}['"]""",
-                     r"""(?i)['"]?db[_-]?password['"]?\s*:\s*['"](?!test|xxxx|changeme|sample|demo)[^'"]{8,}['"]""",
-                     r"""(?i)['"]?access[_-]?key[_-]?id['"]?\s*:\s*['"](?!test|xxxx|changeme|sample|demo)[^'"]{8,}['"]""",
+                     r"""(?i)['\"]?api[_-]?key['\"]?\s*:\s*['\"](?!test|xxxx|changeme|sample|demo)[^'\"]{8,}['\"]""",
+                     r"""(?i)['\"]?client[_-]?secret['\"]?\s*:\s*['\"](?!test|xxxx|changeme|sample|demo)[^'\"]{8,}['\"]""",
+                     r"""(?i)['\"]?jwt[_-]?secret['\"]?\s*:\s*['\"](?!test|xxxx|changeme|sample|demo)[^'\"]{8,}['\"]""",
+                     r"""(?i)['\"]?db[_-]?password['\"]?\s*:\s*['\"](?!test|xxxx|changeme|sample|demo)[^'\"]{8,}['\"]""",
+                     r"""(?i)['\"]?access[_-]?key[_-]?id['\"]?\s*:\s*['\"](?!test|xxxx|changeme|sample|demo)[^'\"]{8,}['\"]""",
                  ]},
-            ],
-        }],
-    },
-    {
-        "id": "npmrc-exposure",
-        "info": {"name": "Exposed .npmrc file", "severity": "critical", "tags": "exposure,npm,secrets"},
-        "http": [{
-            "method": "GET",
-            "path": ["/.npmrc"],
-            "matchers-condition": "and",
-            "matchers": [
-                {"type": "status", "status": [200]},
-                {"type": "regex", "part": "body", "condition": "or",
-                 "regex": [r"(?i)_authToken\s*=", r"(?i)//registry\..*:_(auth|password)\s*="]},
             ],
         }],
     },
@@ -420,8 +488,7 @@ TEMPLATES = [
         "info": {"name": "Database admin panel detected", "severity": "medium", "tags": "panel,admin,phpmyadmin,adminer,pgadmin"},
         "http": [{
             "method": "GET",
-            "path": ["/phpmyadmin/", "/phpMyAdmin/", "/pma/", "/adminer.php", "/adminer/",
-                     "/pgadmin/", "/pgadmin4/"],
+            "path": ["/phpmyadmin/", "/phpMyAdmin/", "/pma/", "/adminer.php", "/adminer/", "/pgadmin/", "/pgadmin4/"],
             "matchers-condition": "and",
             "matchers": [
                 {"type": "status", "status": [200, 401, 403]},
@@ -510,8 +577,7 @@ TEMPLATES = [
             "matchers": [
                 {"type": "status", "status": [200]},
                 {"type": "regex", "part": "body", "condition": "or",
-                 "regex": [r'"status"\s*:\s*"(UP|DOWN|OUT_OF_SERVICE|UNKNOWN)"',
-                           r'"activeProfiles"\s*:', r'"propertySources"\s*:']},
+                 "regex": [r'"status"\s*:\s*"(UP|DOWN|OUT_OF_SERVICE|UNKNOWN)"', r'"activeProfiles"\s*:', r'"propertySources"\s*:']},
             ],
         }],
     },
@@ -533,6 +599,406 @@ TEMPLATES = [
                            r"(?m)^\s*ProxyCommand\s+\S+",
                            r"(?m)^\s*User\s+\S+",
                            r"(?m)^\s*Port\s+\d+"]},
+            ],
+        }],
+    },
+    {
+        "id": "robots-txt-discovery",
+        "info": {"name": "robots.txt discovered", "severity": "info", "tags": "osint,recon,robots,discovery"},
+        "http": [{
+            "method": "GET",
+            "path": ["/robots.txt"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?im)^(User-agent|Disallow|Allow|Sitemap)\s*:"]},
+            ],
+        }],
+    },
+    {
+        "id": "sitemap-xml-discovery",
+        "info": {"name": "Sitemap XML discovered", "severity": "info", "tags": "osint,recon,sitemap,discovery"},
+        "http": [{
+            "method": "GET",
+            "path": ["/sitemap.xml", "/sitemap_index.xml"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?i)<urlset\b", r"(?i)<sitemapindex\b", r"(?i)<loc>https?://"]},
+            ],
+        }],
+    },
+    {
+        "id": "humans-txt-discovery",
+        "info": {"name": "humans.txt discovered", "severity": "info", "tags": "osint,recon,humans,metadata"},
+        "http": [{
+            "method": "GET",
+            "path": ["/humans.txt"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?i)TEAM", r"(?i)THANKS", r"(?i)HUMANS\.TXT"]},
+            ],
+        }],
+    },
+    {
+        "id": "security-txt-discovery",
+        "info": {"name": "security.txt discovered", "severity": "low", "tags": "osint,recon,security-txt,contact"},
+        "http": [{
+            "method": "GET",
+            "path": ["/.well-known/security.txt", "/security.txt"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?im)^(Contact|Expires|Encryption|Policy|Acknowledgments)\s*:"]},
+            ],
+            "extractors": [
+                {"regex": [r"(?im)^Contact:\s*(.+)$"]},
+            ],
+        }],
+    },
+    {
+        "id": "ads-txt-discovery",
+        "info": {"name": "ads.txt discovered", "severity": "info", "tags": "osint,recon,ads,metadata"},
+        "http": [{
+            "method": "GET",
+            "path": ["/ads.txt"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?im)^[\w.-]+\s*,\s*\d+\s*,\s*(DIRECT|RESELLER)"]},
+            ],
+        }],
+    },
+    {
+        "id": "assetlinks-json-discovery",
+        "info": {"name": "Android assetlinks discovered", "severity": "info", "tags": "osint,recon,mobile,android,well-known"},
+        "http": [{
+            "method": "GET",
+            "path": ["/.well-known/assetlinks.json"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r'"relation"\s*:', r'"target"\s*:', r'"android_app"']},
+            ],
+        }],
+    },
+    {
+        "id": "apple-app-site-association-discovery",
+        "info": {"name": "Apple app site association discovered", "severity": "info", "tags": "osint,recon,mobile,ios,well-known"},
+        "http": [{
+            "method": "GET",
+            "path": ["/.well-known/apple-app-site-association", "/apple-app-site-association"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r'"applinks"\s*:', r'"webcredentials"\s*:', r'"appID"\s*:']},
+            ],
+        }],
+    },
+    {
+        "id": "openid-configuration-discovery",
+        "info": {"name": "OpenID configuration metadata discovered", "severity": "low", "tags": "osint,recon,openid,oauth,api,well-known"},
+        "http": [{
+            "method": "GET",
+            "path": ["/.well-known/openid-configuration"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r'"issuer"\s*:', r'"authorization_endpoint"\s*:', r'"token_endpoint"\s*:']},
+            ],
+        }],
+    },
+    {
+        "id": "oauth-authorization-server-discovery",
+        "info": {"name": "OAuth authorization server metadata discovered", "severity": "low", "tags": "osint,recon,oauth,api,well-known"},
+        "http": [{
+            "method": "GET",
+            "path": ["/.well-known/oauth-authorization-server"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r'"issuer"\s*:', r'"authorization_endpoint"\s*:', r'"jwks_uri"\s*:']},
+            ],
+        }],
+    },
+    {
+        "id": "jwks-json-discovery",
+        "info": {"name": "JWKS endpoint discovered", "severity": "low", "tags": "osint,recon,jwks,oauth,api"},
+        "http": [{
+            "method": "GET",
+            "path": ["/.well-known/jwks.json", "/jwks.json"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r'"keys"\s*:\s*\[', r'"kty"\s*:', r'"kid"\s*:']},
+            ],
+        }],
+    },
+    {
+        "id": "web-manifest-discovery",
+        "info": {"name": "Web app manifest discovered", "severity": "info", "tags": "osint,recon,manifest,pwa,metadata"},
+        "http": [{
+            "method": "GET",
+            "path": ["/manifest.json", "/site.webmanifest"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r'"name"\s*:', r'"short_name"\s*:', r'"start_url"\s*:']},
+            ],
+        }],
+    },
+    {
+        "id": "browserconfig-xml-discovery",
+        "info": {"name": "browserconfig.xml discovered", "severity": "info", "tags": "osint,recon,metadata,windows"},
+        "http": [{
+            "method": "GET",
+            "path": ["/browserconfig.xml"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?i)<browserconfig\b", r"(?i)<msapplication\b", r"(?i)<tile"]},
+            ],
+        }],
+    },
+    {
+        "id": "package-lock-exposure",
+        "info": {"name": "Public package-lock metadata", "severity": "info", "tags": "osint,recon,metadata,nodejs"},
+        "http": [{
+            "method": "GET",
+            "path": ["/package-lock.json"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r'"lockfileVersion"\s*:', r'"packages"\s*:', r'"dependencies"\s*:']},
+            ],
+        }],
+    },
+    {
+        "id": "pnpm-lock-exposure",
+        "info": {"name": "Public pnpm lock metadata", "severity": "info", "tags": "osint,recon,metadata,nodejs"},
+        "http": [{
+            "method": "GET",
+            "path": ["/pnpm-lock.yaml"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?m)^lockfileVersion:\s*", r"(?m)^packages:\s*"]},
+            ],
+        }],
+    },
+    {
+        "id": "readme-public-discovery",
+        "info": {"name": "Public README discovered", "severity": "info", "tags": "osint,recon,docs,metadata"},
+        "http": [{
+            "method": "GET",
+            "path": ["/README.md", "/readme.md", "/README.txt"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?im)^#\s+\w+", r"(?im)^##\s+\w+", r"(?i)(installation|usage|license)"]},
+            ],
+        }],
+    },
+    {
+        "id": "changelog-public-discovery",
+        "info": {"name": "Public changelog discovered", "severity": "info", "tags": "osint,recon,docs,changelog,versioning"},
+        "http": [{
+            "method": "GET",
+            "path": ["/CHANGELOG.md", "/changelog.md", "/CHANGES.md"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?i)changelog", r"(?im)^##\s*\[?\d+\.\d+", r"(?i)(added|fixed|changed)"]},
+            ],
+        }],
+    },
+    {
+        "id": "license-public-discovery",
+        "info": {"name": "Public license file discovered", "severity": "info", "tags": "osint,recon,docs,license"},
+        "http": [{
+            "method": "GET",
+            "path": ["/LICENSE", "/LICENSE.txt", "/LICENSE.md"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?i)MIT License", r"(?i)Apache License", r"(?i)GNU GENERAL PUBLIC LICENSE"]},
+            ],
+        }],
+    },
+    {
+        "id": "gitignore-public-discovery",
+        "info": {"name": "Public .gitignore discovered", "severity": "info", "tags": "osint,recon,dev,metadata"},
+        "http": [{
+            "method": "GET",
+            "path": ["/.gitignore"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?m)^node_modules/?$", r"(?m)^\.env$", r"(?m)^__pycache__/"]},
+            ],
+        }],
+    },
+    {
+        "id": "editorconfig-public-discovery",
+        "info": {"name": "Public .editorconfig discovered", "severity": "info", "tags": "osint,recon,dev,metadata"},
+        "http": [{
+            "method": "GET",
+            "path": ["/.editorconfig"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?m)^\[\*\]$", r"(?m)^indent_style\s*=", r"(?m)^end_of_line\s*="]},
+            ],
+        }],
+    },
+    {
+        "id": "env-example-public-discovery",
+        "info": {"name": "Public .env example file discovered", "severity": "low", "tags": "osint,recon,config,env,metadata"},
+        "http": [{
+            "method": "GET",
+            "path": ["/.env.example", "/.env.sample", "/.env.dist", "/example.env"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?im)^(APP_ENV|APP_NAME|DATABASE_URL|DB_HOST)\s*="]},
+            ],
+        }],
+    },
+    {
+        "id": "dockerignore-public-discovery",
+        "info": {"name": "Public .dockerignore discovered", "severity": "info", "tags": "osint,recon,docker,metadata"},
+        "http": [{
+            "method": "GET",
+            "path": ["/.dockerignore"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?m)^node_modules/?$", r"(?m)^\.git/?$", r"(?m)^Dockerfile$"]},
+            ],
+        }],
+    },
+    {
+        "id": "requirements-txt-discovery",
+        "info": {"name": "Public requirements.txt metadata", "severity": "info", "tags": "osint,recon,python,metadata"},
+        "http": [{
+            "method": "GET",
+            "path": ["/requirements.txt"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?m)^[a-zA-Z0-9_.-]+(==|>=)\d[\w.:-]*"]},
+            ],
+        }],
+    },
+    {
+        "id": "pyproject-toml-discovery",
+        "info": {"name": "Public pyproject.toml metadata", "severity": "info", "tags": "osint,recon,python,metadata"},
+        "http": [{
+            "method": "GET",
+            "path": ["/pyproject.toml"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?m)^\[build-system\]", r"(?m)^\[project\]", r"(?m)^name\s*="]},
+            ],
+        }],
+    },
+    {
+        "id": "status-endpoint-metadata",
+        "info": {"name": "Status endpoint metadata discovered", "severity": "low", "tags": "osint,recon,status,monitoring"},
+        "http": [{
+            "method": "GET",
+            "path": ["/status", "/status.json", "/api/status"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r'(?i)"status"\s*:\s*"(ok|up|healthy|degraded)"',
+                           r'(?i)"uptime"\s*:\s*[\d.]+',
+                           r'(?i)"version"\s*:\s*"[^"]+"']},
+            ],
+        }],
+    },
+    {
+        "id": "health-endpoint-metadata",
+        "info": {"name": "Health endpoint metadata discovered", "severity": "low", "tags": "osint,recon,health,monitoring"},
+        "http": [{
+            "method": "GET",
+            "path": ["/health", "/healthz", "/livez", "/readyz"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?i)\b(healthy|ok|pass)\b", r'(?i)\"status\"\s*:']},
+            ],
+        }],
+    },
+    {
+        "id": "prometheus-metrics-discovery",
+        "info": {"name": "Prometheus metrics endpoint discovered", "severity": "low", "tags": "osint,recon,metrics,prometheus"},
+        "http": [{
+            "method": "GET",
+            "path": ["/metrics", "/actuator/prometheus"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?m)^#\s*HELP\s+\w+", r"(?m)^#\s*TYPE\s+\w+", r"(?m)^process_cpu_seconds_total"]},
+            ],
+        }],
+    },
+    {
+        "id": "javascript-sourcemap-exposure",
+        "info": {"name": "JavaScript source map exposure", "severity": "low", "tags": "osint,recon,javascript,sourcemap"},
+        "http": [{
+            "method": "GET",
+            "path": ["/app.js.map", "/main.js.map", "/bundle.js.map", "/static/js/main.js.map"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r'"version"\s*:\s*3', r'"sources"\s*:\s*\[', r'"mappings"\s*:']},
+            ],
+        }],
+    },
+    {
+        "id": "public-email-disclosure",
+        "info": {"name": "Public contact email disclosure", "severity": "info", "tags": "osint,recon,contact,email"},
+        "http": [{
+            "method": "GET",
+            "path": ["/", "/contact", "/about", "/impressum"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "regex", "part": "body", "condition": "or",
+                 "regex": [r"(?i)(?:mailto:)?[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b"]},
+            ],
+            "extractors": [
+                {"regex": [r"(?i)(?:mailto:)?[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b"]},
             ],
         }],
     },
@@ -628,6 +1094,141 @@ def parse_set_cookie_headers(resp):
     return parsed
 
 
+def flatten_extracted_items(items):
+    flattened = []
+    for item in items or []:
+        if isinstance(item, tuple):
+            flattened.append(" = ".join(str(part) for part in item if str(part).strip()))
+        else:
+            flattened.append(str(item))
+    return flattened
+
+
+def get_header_value(resp, header_name):
+    for key, value in resp.headers.items():
+        if key.lower() == header_name.lower():
+            return value
+    return ""
+
+
+def is_text_like_response(resp):
+    content_type = (get_header_value(resp, "Content-Type") or "").lower()
+    return any(token in content_type for token in TEXT_LIKE_CONTENT_TYPES)
+
+
+def looks_like_soft_404(resp, body_text):
+    if resp.status_code in {404, 410}:
+        return True
+
+    if resp.status_code in {401, 403}:
+        return True
+
+    snippet = (body_text or "")[:4000]
+    return any(re.search(pattern, snippet, re.IGNORECASE) for pattern in SOFT_404_BODY_PATTERNS)
+
+
+def should_skip_false_positive(template_id, resp, body_text):
+    text_like = is_text_like_response(resp)
+    soft_404 = looks_like_soft_404(resp, body_text)
+    body_lower = (body_text or "").lower()
+    content_type = (get_header_value(resp, "Content-Type") or "").lower()
+    content_length = get_header_value(resp, "Content-Length") or ""
+
+    if template_id in {
+        "git-config-exposure",
+        "git-head-exposure",
+        "git-commit-editmsg-exposure",
+        "git-logs-exposure",
+        "gitignore-exposure",
+        "gitmodules-exposure",
+        "svn-entries-exposure",
+        "mercurial-repo-exposure",
+        "composer-files-exposure",
+        "docker-files-exposure",
+        "config-json-exposure",
+        "dotenv-exposure",
+        "wp-config-exposure",
+        "sensitive-ssh-files-exposure",
+    }:
+        if soft_404:
+            return True
+
+    if template_id == "phpinfo-exposure" and (soft_404 or "phpinfo()" not in body_lower and "php version" not in body_lower):
+        return True
+
+    if template_id == "dsstore-exposure" and text_like:
+        return True
+
+    if template_id in {"backup-files-exposure", "docker-files-exposure"}:
+        if soft_404:
+            return True
+        if text_like and "zip" not in content_type and "gzip" not in content_type and "tar" not in content_type and "sql" not in content_type:
+            return True
+
+    if template_id == "directory-listing-enabled":
+        if soft_404:
+            return True
+        if "index of /" not in body_lower and "parent directory" not in body_lower:
+            return True
+
+    if template_id == "cors-wildcard-misconfig" and soft_404:
+        return True
+
+    if template_id == "wordpress-detect":
+        if soft_404:
+            return True
+        if "/wp-" not in body_lower and "wp-content" not in body_lower and "wp-includes" not in body_lower and "x-powered-by: php" not in "\n".join(f"{k}: {v}" for k, v in resp.headers.items()).lower():
+            return True
+
+    if template_id == "server-header-disclosure":
+        if not get_header_value(resp, "Server") and not get_header_value(resp, "X-Powered-By"):
+            return True
+
+    if template_id in {"cookies-missing-secure", "cookies-missing-httponly", "cookies-missing-samesite"}:
+        cookies = parse_set_cookie_headers(resp)
+        if not any(c.get("is_auth") for c in cookies):
+            return True
+
+    if template_id in {"swagger-ui-detect", "graphql-endpoint-detect", "spring-actuator-exposure", "status-endpoint-metadata", "health-endpoint-metadata", "prometheus-metrics-discovery"} and soft_404:
+        return True
+
+    if template_id == "elasticsearch-open-instance":
+        if soft_404 or '"cluster_name"' not in body_text:
+            return True
+
+    if template_id == "public-email-disclosure" and soft_404:
+        return True
+
+    if template_id == "javascript-sourcemap-exposure":
+        if soft_404:
+            return True
+        if '"version"' not in body_text and '"sources"' not in body_text:
+            return True
+
+    if template_id == "robots-txt-discovery" and soft_404:
+        return True
+
+    if template_id == "sitemap-xml-discovery" and (soft_404 or "<urlset" not in body_lower and "<sitemapindex" not in body_lower):
+        return True
+
+    if template_id == "browserconfig-xml-discovery" and (soft_404 or "<browserconfig" not in body_lower):
+        return True
+
+    if template_id in {"readme-public-discovery", "changelog-public-discovery", "license-public-discovery"}:
+        if soft_404 or not text_like:
+            return True
+
+    if template_id in {"package-lock-exposure", "pnpm-lock-exposure", "requirements-txt-discovery", "pyproject-toml-discovery", "dockerignore-public-discovery", "editorconfig-public-discovery", "env-example-public-discovery", "gitignore-public-discovery"}:
+        if soft_404:
+            return True
+
+    if template_id in {"git-commit-editmsg-exposure", "readme-public-discovery", "changelog-public-discovery", "license-public-discovery"}:
+        if content_length == "0":
+            return True
+
+    return False
+
+
 def eval_matcher(m, resp, body_text):
     mtype = m.get("type")
     part = m.get("part", "body")
@@ -681,7 +1282,7 @@ def run_extractors(extractors, body_text, resp=None):
                     if c.get("is_auth") and flag_l not in c.get("attrs", set()):
                         found.append(f"{c.get('name')} missing {flag}")
 
-    return found[:10]
+    return flatten_extracted_items(found)[:10]
 
 
 def matches_condition(results, condition):
@@ -732,6 +1333,8 @@ def scan_target(target, templates, timeout=8):
 
                 matcher_results = [eval_matcher(m, resp, body_text) for m in block.get("matchers", [])]
                 if matches_condition(matcher_results, matchers_cond):
+                    if should_skip_false_positive(tpl.get("id"), resp, body_text):
+                        continue
                     extracted = run_extractors(block.get("extractors"), body_text, resp)
                     findings.append({
                         "template": tpl.get("id"),
@@ -742,21 +1345,21 @@ def scan_target(target, templates, timeout=8):
                         "status_code": resp.status_code,
                         "extracted": extracted,
                     })
-                    break  # one hit per template block is enough
+                    break
     return target, findings
 
 
 # ------------------------------------------------------------------ #
 # Output
 # ------------------------------------------------------------------ #
-def print_finding(f):
-    sev = f["severity"].lower()
+def print_finding(finding):
+    sev = finding["severity"].lower()
     color = SEVERITY_COLOR.get(sev, RESET)
-    tags = f"{GREY}[{f['tags']}]{RESET}" if f.get("tags") else ""
-    print(f"{color}[{sev.upper():^8}]{RESET} {BOLD}{f['template']}{RESET} {tags}")
-    print(f"    {GREEN}→{RESET} {f['matched_url']}  {GREY}({f['status_code']}){RESET}")
-    if f.get("extracted"):
-        print(f"    {CYAN}extracted:{RESET} {f['extracted']}")
+    tags = f"{GREY}[{finding['tags']}]{RESET}" if finding.get("tags") else ""
+    print(f"{color}[{sev.upper():^8}]{RESET} {BOLD}{finding['template']}{RESET} {tags}")
+    print(f"    {GREEN}→{RESET} {finding['matched_url']}  {GREY}({finding['status_code']}){RESET}")
+    if finding.get("extracted"):
+        print(f"    {CYAN}extracted:{RESET} {finding['extracted']}")
 
 
 def write_output(all_results, out_path):
@@ -767,17 +1370,29 @@ def write_output(all_results, out_path):
     elif ext == ".csv":
         import csv
         with open(out_path, "w", newline="") as f:
-            w = csv.writer(f)
-            w.writerow(["target", "template", "severity", "tags", "matched_url", "status_code", "extracted"])
+            writer = csv.writer(f)
+            writer.writerow(["target", "template", "severity", "tags", "matched_url", "status_code", "extracted"])
             for target, findings in all_results.items():
-                for f_ in findings:
-                    w.writerow([target, f_["template"], f_["severity"], f_["tags"],
-                                f_["matched_url"], f_["status_code"], ";".join(f_.get("extracted", []))])
+                for finding in findings:
+                    extracted = finding.get("extracted", [])
+                    flattened = [str(item) for item in extracted]
+                    writer.writerow([
+                        target,
+                        finding["template"],
+                        finding["severity"],
+                        finding["tags"],
+                        finding["matched_url"],
+                        finding["status_code"],
+                        ";".join(flattened),
+                    ])
     else:
         with open(out_path, "w") as f:
             for target, findings in all_results.items():
-                for f_ in findings:
-                    f.write(f"[{f_['severity'].upper()}] {f_['template']} -> {f_['matched_url']} ({f_['status_code']})\n")
+                for finding in findings:
+                    f.write(
+                        f"[{finding['severity'].upper()}] {finding['template']} -> "
+                        f"{finding['matched_url']} ({finding['status_code']})\n"
+                    )
 
 
 def print_template_list(templates):
@@ -838,14 +1453,14 @@ def main():
     start = time.time()
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=args.concurrency) as pool:
-        futures = {pool.submit(scan_target, t, templates, args.timeout): t for t in targets}
+        futures = {pool.submit(scan_target, target, templates, args.timeout): target for target in targets}
         for fut in concurrent.futures.as_completed(futures):
             target, findings = fut.result()
             all_results[target] = findings
             if findings:
                 print(f"{BOLD}{CYAN}== {target} =={RESET}")
-                for f_ in findings:
-                    print_finding(f_)
+                for finding in findings:
+                    print_finding(finding)
                     total_findings += 1
                 print()
 

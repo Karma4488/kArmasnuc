@@ -85,12 +85,14 @@ def matrix_rain(duration: float = 1.5) -> None:
 
     # per-column state: current head row position
     heads  = [random.randint(-rows, 0) for _ in range(cols)]
-    speeds = [random.choice([1, 1, 2]) for _ in range(cols)]
+    # speed 1 (slower) is twice as likely as speed 2 for a natural look
+    speeds = [random.choices([1, 2], weights=[2, 1])[0] for _ in range(cols)]
 
     # hide cursor, switch to alternate screen buffer
     sys.stdout.write("\033[?25l\033[?1049h\033[2J")
     sys.stdout.flush()
 
+    _FRAME_DELAY = 0.045  # ~22 FPS for smooth animation
     deadline = time.monotonic() + duration
     try:
         while time.monotonic() < deadline:
@@ -115,7 +117,7 @@ def matrix_rain(duration: float = 1.5) -> None:
                     heads[col] = random.randint(-rows, 0)
             sys.stdout.write("".join(buf))
             sys.stdout.flush()
-            time.sleep(0.045)
+            time.sleep(_FRAME_DELAY)
     finally:
         # restore: clear alternate buffer, switch back, show cursor
         sys.stdout.write("\033[2J\033[?1049l\033[?25h")

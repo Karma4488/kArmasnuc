@@ -4880,7 +4880,376 @@ TEMPLATES = [
                     ]
                 }
             ]
-        }
+        },
+
+    # ------------------------------------------------------------------ #
+    # Backdoor / Web-shell detection
+    # ------------------------------------------------------------------ #
+    {
+        "id": "backdoor-php-webshell-common-paths",
+        "info": {
+            "name": "PHP webshell at common paths",
+            "severity": "critical",
+            "tags": "backdoor,webshell,php,rce",
+        },
+        "http": [{
+            "method": "GET",
+            "path": [
+                "/shell.php", "/cmd.php", "/c99.php", "/r57.php", "/b374k.php",
+                "/wso.php", "/mini.php", "/indoxploit.php", "/sx.php",
+                "/webshell.php", "/backdoor.php", "/sh.php", "/1.php",
+                "/uploads/shell.php", "/uploads/cmd.php", "/uploads/1.php",
+                "/images/shell.php", "/tmp/shell.php", "/files/shell.php",
+                "/wp-content/uploads/shell.php", "/wp-content/uploads/cmd.php",
+            ],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {
+                    "type": "regex",
+                    "part": "body",
+                    "condition": "or",
+                    "regex": [
+                        r"(?i)uname\s*-a",
+                        r"(?i)system\s*\(",
+                        r"(?i)passthru\s*\(",
+                        r"(?i)shell_exec\s*\(",
+                        r"(?i)eval\s*\(base64_decode",
+                        r"(?i)<title>\s*(c99|r57|b374k|wso shell|indoxploit)",
+                        r"(?i)FilesMan",
+                        r"(?i)PHP Shell",
+                        r"(?i)Web Shell",
+                        r"(?i)webshell",
+                    ],
+                },
+            ],
+        }],
+    },
+    {
+        "id": "backdoor-php-webshell-signatures",
+        "info": {
+            "name": "PHP webshell body signatures",
+            "severity": "critical",
+            "tags": "backdoor,webshell,php,rce",
+        },
+        "http": [{
+            "method": "GET",
+            "path": ["/"],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "word", "part": "header", "condition": "or",
+                 "words": ["text/html", "text/plain", "application/x-php"]},
+                {
+                    "type": "regex",
+                    "part": "body",
+                    "condition": "or",
+                    "regex": [
+                        r"(?i)eval\s*\(\s*(base64_decode|gzinflate|str_rot13|gzuncompress)\s*\(",
+                        r"(?i)\$_(GET|POST|REQUEST|COOKIE)\s*\[\s*['\"]?cmd['\"]?\s*\]",
+                        r"(?i)preg_replace\s*\(\s*['\"].*/e['\"]",
+                        r"China Chopper",
+                        r"(?i)assert\s*\(\s*\$_(GET|POST|REQUEST)",
+                    ],
+                },
+            ],
+        }],
+    },
+    {
+        "id": "backdoor-asp-aspx-webshell",
+        "info": {
+            "name": "ASP/ASPX webshell at common paths",
+            "severity": "critical",
+            "tags": "backdoor,webshell,asp,rce",
+        },
+        "http": [{
+            "method": "GET",
+            "path": [
+                "/shell.asp", "/cmd.asp", "/shell.aspx", "/cmd.aspx",
+                "/webshell.asp", "/webshell.aspx", "/backdoor.asp", "/backdoor.aspx",
+                "/uploads/shell.asp", "/uploads/shell.aspx",
+                "/asp/shell.asp", "/aspx/shell.aspx",
+            ],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {
+                    "type": "regex",
+                    "part": "body",
+                    "condition": "or",
+                    "regex": [
+                        r"(?i)cmd\.exe",
+                        r"(?i)wscript\.shell",
+                        r"(?i)CreateObject\s*\(\s*[\"']WScript\.Shell[\"']",
+                        r"(?i)Response\.Write\s*\(Shell",
+                        r"(?i)ExecuteCommand",
+                        r"(?i)<%\s*eval\s+request\(",
+                        r"(?i)asp shell",
+                    ],
+                },
+            ],
+        }],
+    },
+    {
+        "id": "backdoor-jsp-webshell",
+        "info": {
+            "name": "JSP webshell at common paths",
+            "severity": "critical",
+            "tags": "backdoor,webshell,jsp,rce",
+        },
+        "http": [{
+            "method": "GET",
+            "path": [
+                "/shell.jsp", "/cmd.jsp", "/webshell.jsp", "/backdoor.jsp",
+                "/uploads/shell.jsp", "/uploads/cmd.jsp",
+                "/shell.jspx", "/cmd.jspx",
+            ],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {
+                    "type": "regex",
+                    "part": "body",
+                    "condition": "or",
+                    "regex": [
+                        r"(?i)Runtime\.getRuntime\(\)\.exec",
+                        r"(?i)ProcessBuilder",
+                        r"(?i)<%\s*=\s*Runtime",
+                        r"(?i)java\.lang\.Runtime",
+                        r"(?i)jsp shell",
+                        r"(?i)JspSpy",
+                    ],
+                },
+            ],
+        }],
+    },
+    {
+        "id": "backdoor-c99-r57-shell",
+        "info": {
+            "name": "c99 / r57 webshell detection",
+            "severity": "critical",
+            "tags": "backdoor,webshell,php,c99,r57,rce",
+        },
+        "http": [{
+            "method": "GET",
+            "path": [
+                "/c99.php", "/r57.php", "/c99shell.php", "/r57shell.php",
+                "/c100.php", "/c99_Shell.php",
+                "/uploads/c99.php", "/uploads/r57.php",
+                "/tmp/c99.php", "/tmp/r57.php",
+            ],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {
+                    "type": "regex",
+                    "part": "body",
+                    "condition": "or",
+                    "regex": [
+                        r"(?i)c99shell",
+                        r"(?i)r57shell",
+                        r"(?i)c99 Shell",
+                        r"(?i)r57 Shell",
+                        r"(?i)uname -a",
+                        r"(?i)Safe[- ]?Mode",
+                    ],
+                },
+            ],
+        }],
+    },
+    {
+        "id": "backdoor-b374k-wso-shell",
+        "info": {
+            "name": "b374k / WSO webshell detection",
+            "severity": "critical",
+            "tags": "backdoor,webshell,php,b374k,wso,rce",
+        },
+        "http": [{
+            "method": "GET",
+            "path": [
+                "/b374k.php", "/wso.php", "/wso2.php",
+                "/uploads/b374k.php", "/uploads/wso.php",
+                "/files/b374k.php", "/files/wso.php",
+            ],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {
+                    "type": "regex",
+                    "part": "body",
+                    "condition": "or",
+                    "regex": [
+                        r"(?i)b374k",
+                        r"(?i)wso\s*shell",
+                        r"(?i)Web Shell by oRb",
+                        r"(?i)FilesMan",
+                        r"(?i)\$auth_pass",
+                    ],
+                },
+            ],
+        }],
+    },
+    {
+        "id": "backdoor-china-chopper",
+        "info": {
+            "name": "China Chopper webshell probe",
+            "severity": "critical",
+            "tags": "backdoor,webshell,php,asp,china-chopper,rce",
+        },
+        "http": [{
+            "method": "GET",
+            "path": [
+                "/chopper.php", "/chopper.asp", "/cc.php",
+                "/uploads/chopper.php", "/shell/chopper.php",
+            ],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {
+                    "type": "regex",
+                    "part": "body",
+                    "condition": "or",
+                    "regex": [
+                        r"(?i)China Chopper",
+                        r"(?i)eval\s*\(\s*\$_POST\s*\[",
+                        r"(?i)assert\s*\(\s*stripslashes\s*\(\s*\$_POST",
+                        r"(?i)<%\s*eval\s*request\s*\(",
+                    ],
+                },
+            ],
+        }],
+    },
+    {
+        "id": "backdoor-hidden-php-file",
+        "info": {
+            "name": "Hidden / dot-prefixed PHP file",
+            "severity": "high",
+            "tags": "backdoor,webshell,php,hidden",
+        },
+        "http": [{
+            "method": "GET",
+            "path": [
+                "/.shell.php", "/.cmd.php", "/.backdoor.php",
+                "/.x.php", "/.htaccess.php",
+                "/.hidden.php", "/.secret.php",
+            ],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {"type": "word", "part": "header", "condition": "or",
+                 "words": ["text/html", "application/x-php", "text/plain"]},
+                {
+                    "type": "regex",
+                    "part": "body",
+                    "condition": "or",
+                    "regex": [
+                        r"<\?php",
+                        r"(?i)eval\s*\(",
+                        r"(?i)system\s*\(",
+                        r"(?i)shell_exec",
+                        r"(?i)base64_decode",
+                    ],
+                },
+            ],
+        }],
+    },
+    {
+        "id": "backdoor-image-php-polyglot",
+        "info": {
+            "name": "Image file with embedded PHP code (polyglot shell)",
+            "severity": "critical",
+            "tags": "backdoor,webshell,php,polyglot,upload",
+        },
+        "http": [{
+            "method": "GET",
+            "path": [
+                "/uploads/shell.jpg", "/uploads/shell.png", "/uploads/shell.gif",
+                "/uploads/image.php.jpg", "/uploads/cmd.jpg",
+                "/files/shell.jpg", "/images/shell.php.jpg",
+            ],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {
+                    "type": "regex",
+                    "part": "body",
+                    "regex": [r"<\?php"],
+                },
+            ],
+        }],
+    },
+    {
+        "id": "backdoor-wordpress-plugin-shell",
+        "info": {
+            "name": "Webshell embedded in WordPress plugin/theme",
+            "severity": "critical",
+            "tags": "backdoor,webshell,wordpress,php,rce",
+        },
+        "http": [{
+            "method": "GET",
+            "path": [
+                "/wp-content/plugins/shell.php",
+                "/wp-content/plugins/cmd.php",
+                "/wp-content/themes/shell.php",
+                "/wp-content/themes/cmd.php",
+                "/wp-content/uploads/wpshell.php",
+                "/wp-content/plugins/akismet/shell.php",
+                "/wp-content/plugins/woocommerce/shell.php",
+            ],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {
+                    "type": "regex",
+                    "part": "body",
+                    "condition": "or",
+                    "regex": [
+                        r"(?i)system\s*\(",
+                        r"(?i)shell_exec\s*\(",
+                        r"(?i)eval\s*\(base64_decode",
+                        r"(?i)passthru\s*\(",
+                        r"(?i)\$_(GET|POST|REQUEST)\s*\[['\"]?cmd",
+                    ],
+                },
+            ],
+        }],
+    },
+    {
+        "id": "backdoor-generic-shell-upload-path",
+        "info": {
+            "name": "Webshell at generic upload/temp paths",
+            "severity": "critical",
+            "tags": "backdoor,webshell,php,upload,rce",
+        },
+        "http": [{
+            "method": "GET",
+            "path": [
+                "/uploads/shell.php", "/uploads/cmd.php", "/upload/shell.php",
+                "/upload/cmd.php", "/media/shell.php", "/media/cmd.php",
+                "/static/shell.php", "/public/shell.php", "/data/shell.php",
+                "/assets/shell.php", "/content/shell.php",
+                "/tmp/shell.php", "/temp/shell.php",
+                "/var/tmp/shell.php",
+            ],
+            "matchers-condition": "and",
+            "matchers": [
+                {"type": "status", "status": [200]},
+                {
+                    "type": "regex",
+                    "part": "body",
+                    "condition": "or",
+                    "regex": [
+                        r"(?i)system\s*\(",
+                        r"(?i)shell_exec\s*\(",
+                        r"(?i)eval\s*\(base64_decode",
+                        r"(?i)passthru\s*\(",
+                        r"(?i)\$_(GET|POST|REQUEST)\s*\[['\"]?cmd",
+                        r"(?i)exec\s*\(",
+                    ],
+                },
+            ],
+        }],
+    },
 ]
 
 
